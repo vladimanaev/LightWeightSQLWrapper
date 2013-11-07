@@ -219,8 +219,8 @@ public class Query
 	 * </p>
 	 * <b>By Default Allows:</b> [^a-z0-9 %|'|;|*|,|.|_|=|(|)|:|?|/|!|[|]|+|\"|{|}|$|@|\u0590-\u05FF|^\\s*$] </p>
 	 * 
-	 * @param
-	 * @return
+	 * @param query
+	 * @return true if query string legal according to given regex (see default regex on <code>setRegexPattern(..)</code> method).
 	 */
 	public static boolean isThisStringLigalAccordingToRegexPattern(String query)
 	{
