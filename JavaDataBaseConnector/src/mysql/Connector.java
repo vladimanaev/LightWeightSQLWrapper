@@ -134,10 +134,12 @@ public class Connector
 	 * Opens connection to MySQL database
 	 * 
 	 * @throws SQLException
+	 * @throws ClassNotFoundException 
 	 */
-	public void openConnection() throws SQLException
+	public void openConnection() throws SQLException, ClassNotFoundException
 	{
-		connection = (Connection) DriverManager.getConnection(url, user, password);
+			
+			connection = (Connection) DriverManager.getConnection(url, user, password);
 	}
 
 	/**
@@ -183,8 +185,9 @@ public class Connector
 	 * @param query
 	 * @throws SQLException
 	 * @throws IlegalQueryException
+	 * @throws ClassNotFoundException 
 	 */
-	public void handleQuery(Query query) throws SQLException, IlegalQueryException
+	public void handleQuery(Query query) throws SQLException, IlegalQueryException, ClassNotFoundException
 	{
 		if (query.isQueryValid())
 		{
@@ -222,8 +225,9 @@ public class Connector
 	 * @param query
 	 * @throws SQLException
 	 * @throws IlegalQueryException
+	 * @throws ClassNotFoundException 
 	 */
-	public Result handleSelectQuery(Query query) throws SQLException, IlegalQueryException
+	public Result handleSelectQuery(Query query) throws SQLException, IlegalQueryException, ClassNotFoundException
 	{
 		Result mySQLResult = new Result();
 
