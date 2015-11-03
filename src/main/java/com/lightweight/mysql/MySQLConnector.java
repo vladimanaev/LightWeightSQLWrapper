@@ -169,7 +169,7 @@ public class MySQLConnector {
 				preparedStatement.setFloat(i + 1, Float.parseFloat(mySQLQuery.getParameterValue(i)));
 
 			} else {
-				throw new IllegalSQLQueryException("Invalid type of Query.ParameterType!");
+				throw new IllegalSQLQueryException("Invalid type of ParameterType!");
 			}
 		}
 	}
