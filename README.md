@@ -5,7 +5,7 @@ Lightweight mysql driver wrapper which let you connect faster and easier to an e
 
 Dependencies
 =============
-```javascript
+```
 <dependency>
 	<groupId>mysql</groupId>
 	<artifactId>mysql-connector-java</artifactId>
