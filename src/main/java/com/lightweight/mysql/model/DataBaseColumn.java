@@ -22,6 +22,7 @@ package com.lightweight.mysql.model;
  * @author Vladi - 01:59 PM 9/12/2013
  */
 public class DataBaseColumn {
+	
 	private String columnName;
 	private String columnValue;
 
@@ -40,4 +41,11 @@ public class DataBaseColumn {
 	public void setColumnValue(String columnValue) {
 		this.columnValue = columnValue;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s : %s", columnName, columnValue);
+	}
+
+	//TODO impl equals, hash
 }
