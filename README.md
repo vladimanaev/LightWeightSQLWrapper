@@ -1,4 +1,4 @@
-JavaDataBaseConnector
+Lightweight MySQL wrapper
 =====================
 
 Lightweight mysql driver wrapper which let you connect faster and easier to an existing database.
