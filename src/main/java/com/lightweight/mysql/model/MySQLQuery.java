@@ -17,6 +17,7 @@
 package com.lightweight.mysql.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class should serve as Query to MySQL database
@@ -26,23 +27,17 @@ import java.util.ArrayList;
 public class MySQLQuery {
 
 	private String query;
-	private QueryState queryState;
-	private ArrayList<Parameter> parameters = new ArrayList<Parameter>();
-
-	public enum QueryState {
-		Ilegal, Legal
-	}
+	private List<Parameter> parameters = new ArrayList<Parameter>();
 
 	public enum ParameterType {
-		text, intNumber, doubleNumber, floatNumber
+		STRING, INTEGER, DOUBLE, FLOAT
 	}
 
 	private class Parameter {
 		private String value;
 		private ParameterType parameterType;
 
-		public Parameter(String value, ParameterType parameterType)
-		{
+		public Parameter(String value, ParameterType parameterType) {
 			this.setValue(value);
 			this.setParameterType(parameterType);
 		}
@@ -55,45 +50,45 @@ public class MySQLQuery {
 			this.parameterType = parameterType;
 		}
 
-		public String getValue()
-		{
+		public String getValue() {
 			return value;
 		}
 
-		public void setValue(String value)
-		{
+		public void setValue(String value) {
 			this.value = value;
 		}
 	}
 
 	public MySQLQuery() {
-		this.queryState = QueryState.Ilegal;
 		this.query = "";
 	}
 
-	public MySQLQuery(String queryString, QueryState state) {
+	public MySQLQuery(String queryString) {
 		this.query = queryString;
-		this.queryState = state;
+	}
+	
+	public void addParameters(List<Parameter> parameters) {
+		this.parameters.addAll(parameters);
 	}
 
 	public void addParameter(String value, ParameterType parameterType) {
 		this.parameters.add(new Parameter(value, parameterType));
 	}
 
-	public void addTextParameter(String value) {
-		this.parameters.add(new Parameter(value, MySQLQuery.ParameterType.text));
+	public void addStringParameter(String value) {
+		this.parameters.add(new Parameter(value, ParameterType.STRING));
 	}
 
 	public void addIntParameter(int value) {
-		this.parameters.add(new Parameter(Integer.toString(value), MySQLQuery.ParameterType.intNumber));
+		this.parameters.add(new Parameter(Integer.toString(value), ParameterType.INTEGER));
 	}
 
 	public void addDoubleParameter(double value) {
-		this.parameters.add(new Parameter(Double.toString(value), MySQLQuery.ParameterType.doubleNumber));
+		this.parameters.add(new Parameter(Double.toString(value), ParameterType.DOUBLE));
 	}
 
 	public void addFloatParameter(float value) {
-		this.parameters.add(new Parameter(Float.toString(value), MySQLQuery.ParameterType.floatNumber));
+		this.parameters.add(new Parameter(Float.toString(value), ParameterType.FLOAT));
 	}
 
 	public String getParameterValue(int index) {
@@ -108,32 +103,14 @@ public class MySQLQuery {
 		return this.parameters.size();
 	}
 
-	public void setQuery(String queryString, QueryState state) {
-		this.query = queryString;
-		this.queryState = state;
-	}
-
 	public void setQueryString(String queryString) {
-		if (queryString == null || queryString.isEmpty()) {
-			this.query = "";
-			this.queryState = QueryState.Ilegal;
-		} else {
-			this.query = queryString;
-			this.queryState = QueryState.Legal;
-		}
-	}
-
-	public QueryState getQueryState() {
-		return this.queryState;
-	}
-
-	public boolean isQueryValid() {
-		return (queryState == QueryState.Legal);
+		this.query = queryString;
 	}
 
 	@Override
 	public String toString() {
 		return this.query;
 	}
-	
+
+	//TODO impl equals, hash
 }

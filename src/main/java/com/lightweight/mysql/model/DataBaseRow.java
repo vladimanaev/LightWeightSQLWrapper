@@ -17,28 +17,44 @@
 package com.lightweight.mysql.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * This class should serve as Result from MySQL database query
+ * This class serve as row in MySQL database
  * 
- * @author Vladi - 07:30 PM 9/12/2013
+ * @author Vladi - 01:59 PM 9/12/2013
  */
-public class Result {
-	private ArrayList<DataBaseRow> rows = new ArrayList<DataBaseRow>();
+public class DataBaseRow {
+	
+	private List<DataBaseColumn> row = new ArrayList<DataBaseColumn>();
 
-	public DataBaseRow getRow(int index) {
-		return this.rows.get(index);
+	public DataBaseColumn getColumn(int index) {
+		return this.row.get(index);
 	}
 
-	public void addRow(DataBaseRow dataBaseRow) {
-		this.rows.add(dataBaseRow);
+	public void addColumn(DataBaseColumn dataBaseColumn) {
+		this.row.add(dataBaseColumn);
 	}
 
-	public int size() {
-		return this.rows.size();
+	public int getNumOfColumns() {
+		return this.row.size();
 	}
 
 	public void clear() {
-		this.rows.clear();
+		this.row.clear();
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(" | ");
+		for(DataBaseColumn curr : row) {
+			builder.append(curr.toString());
+			builder.append(" | ");
+		}
+		
+		return builder.toString();
+	}
+
+	//TODO impl equals, hash
 }

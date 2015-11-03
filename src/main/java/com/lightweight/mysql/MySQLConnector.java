@@ -83,28 +83,23 @@ public class MySQLConnector {
 	 * Insert, Update, Drop, Delete, Create, Alter query to MySQL database.
 	 */
 	public void executeUpdateQuery(MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException, ClassNotFoundException {
-		if (mySQLQuery.isQueryValid()) {
-			try {
-				if (!isConnected()) {
-					open();
-				}
-
-				preparedStatement = (PreparedStatement) connection.prepareStatement(mySQLQuery.toString());
-				updatePreparedStatementWithParameters(preparedStatement, mySQLQuery);
-				preparedStatement.executeUpdate();
-
-			} finally {
-				if (preparedStatement != null) {
-					preparedStatement.close();
-				}
-				if (connection != null)
-				{
-					connection.close();
-				}
+		try {
+			if (!isConnected()) {
+				open();
 			}
-		} else
-		{
-			throw new IllegalSQLQueryException("Ilegal query!");
+
+			preparedStatement = (PreparedStatement) connection.prepareStatement(mySQLQuery.toString());
+			updatePreparedStatementWithParameters(preparedStatement, mySQLQuery);
+			preparedStatement.executeUpdate();
+
+		} finally {
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connection != null)
+			{
+				connection.close();
+			}
 		}
 	}
 
@@ -114,46 +109,42 @@ public class MySQLConnector {
 	public Result executeSelectQuery(MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException, ClassNotFoundException {
 		Result mySQLResult = new Result();
 
-		if (mySQLQuery.isQueryValid()) {
-			try {
-				if (!isConnected()) {
-					open();
-				}
-
-				preparedStatement = (PreparedStatement) connection.prepareStatement(mySQLQuery.toString());
-				updatePreparedStatementWithParameters(preparedStatement, mySQLQuery);
-				result = preparedStatement.executeQuery();
-				ResultSetMetaData resultMetaData = (ResultSetMetaData) result.getMetaData();
-
-				int maxNumberOfColums = resultMetaData.getColumnCount();
-
-				while (result.next()) {
-					DataBaseRow row = new DataBaseRow();
-					for (int columnNumber = 1; columnNumber <= maxNumberOfColums; columnNumber++) {
-						DataBaseColumn column = new DataBaseColumn();
-
-						column.setColumnName(resultMetaData.getColumnName(columnNumber));
-						column.setColumnValue(result.getString(columnNumber));
-
-						row.addColumn(column);
-					}
-
-					mySQLResult.addRow(row);
-				}
-
-			} finally {
-				if (result != null) {
-					result.close();
-				}
-				if (preparedStatement != null) {
-					preparedStatement.close();
-				}
-				if (connection != null) {
-					connection.close();
-				}
+		try {
+			if (!isConnected()) {
+				open();
 			}
-		} else {
-			throw new IllegalSQLQueryException("Ilegal query!");
+
+			preparedStatement = (PreparedStatement) connection.prepareStatement(mySQLQuery.toString());
+			updatePreparedStatementWithParameters(preparedStatement, mySQLQuery);
+			result = preparedStatement.executeQuery();
+			ResultSetMetaData resultMetaData = (ResultSetMetaData) result.getMetaData();
+
+			int maxNumberOfColums = resultMetaData.getColumnCount();
+
+			while (result.next()) {
+				DataBaseRow row = new DataBaseRow();
+				for (int columnNumber = 1; columnNumber <= maxNumberOfColums; columnNumber++) {
+					DataBaseColumn column = new DataBaseColumn();
+
+					column.setColumnName(resultMetaData.getColumnName(columnNumber));
+					column.setColumnValue(result.getString(columnNumber));
+
+					row.addColumn(column);
+				}
+
+				mySQLResult.addRow(row);
+			}
+
+		} finally {
+			if (result != null) {
+				result.close();
+			}
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connection != null) {
+				connection.close();
+			}
 		}
 
 		return mySQLResult;
@@ -165,16 +156,16 @@ public class MySQLConnector {
 	private void updatePreparedStatementWithParameters(PreparedStatement preparedStatement, MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException {
 		// Databases counts from 1 and not 0 thats why there is (i + 1).
 		for (int i = 0; i < mySQLQuery.getNumberOfParameters(); i++) {
-			if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.text) {
+			if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.STRING) {
 				preparedStatement.setString(i + 1, mySQLQuery.getParameterValue(i));
 
-			} else if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.intNumber) {
+			} else if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.INTEGER) {
 				preparedStatement.setInt(i + 1, Integer.parseInt(mySQLQuery.getParameterValue(i)));
 
-			} else if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.doubleNumber) {
+			} else if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.DOUBLE) {
 				preparedStatement.setDouble(i + 1, Double.parseDouble(mySQLQuery.getParameterValue(i)));
 
-			} else if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.floatNumber) {
+			} else if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.FLOAT) {
 				preparedStatement.setFloat(i + 1, Float.parseFloat(mySQLQuery.getParameterValue(i)));
 
 			} else {
