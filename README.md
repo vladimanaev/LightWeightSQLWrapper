@@ -1,7 +1,15 @@
 JavaDataBaseConnector
 =====================
 
-Library which let you connect faster and easier to a databases.
+Lightweight mysql driver wrapper which let you connect faster and easier to an existing database.
 
-* This is only a wrapper for mysql-connector-java-5.1.23-bin.jar library from apache.
-Therefore you must add mysql-connector-java-5.1.23-bin.jar to your project or any newer version in order to make my wrapper work correctly. 
+Dependencies
+=============
+```javascript
+<dependency>
+	<groupId>mysql</groupId>
+	<artifactId>mysql-connector-java</artifactId>
+	<version>5.1.6</version>
+</dependency>
+```
+

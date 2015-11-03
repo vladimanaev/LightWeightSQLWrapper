@@ -1,6 +1,20 @@
-*.class
+# Build Artifacts
 
-# Package Files #
-*.jar
-*.war
-*.ear
+.gradle/
+build/
+target/
+bin/
+dependency-reduced-pom.xml
+
+# Eclipse Project Files
+
+.classpath
+.project
+.settings/
+
+# IntelliJ IDEA Files
+
+*.iml
+*.ipr
+*.iws
+*.idea
