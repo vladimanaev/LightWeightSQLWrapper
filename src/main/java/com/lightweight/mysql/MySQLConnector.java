@@ -36,8 +36,6 @@ import com.mysql.jdbc.ResultSetMetaData;
 */
 public class MySQLConnector {
 	private Connection connection = null;
-	private PreparedStatement preparedStatement = null;
-	private ResultSet result = null;
 
 	private String url;
 	private String user;
@@ -83,6 +81,7 @@ public class MySQLConnector {
 	 * Insert, Update, Drop, Delete, Create, Alter query to MySQL database.
 	 */
 	public void executeUpdateQuery(MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException, ClassNotFoundException {
+		PreparedStatement preparedStatement = null;
 		try {
 			if (!isConnected()) {
 				open();
@@ -108,7 +107,8 @@ public class MySQLConnector {
 	 */
 	public Result executeSelectQuery(MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException, ClassNotFoundException {
 		Result mySQLResult = new Result();
-
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		try {
 			if (!isConnected()) {
 				open();
@@ -116,18 +116,18 @@ public class MySQLConnector {
 
 			preparedStatement = (PreparedStatement) connection.prepareStatement(mySQLQuery.toString());
 			updatePreparedStatementWithParameters(preparedStatement, mySQLQuery);
-			result = preparedStatement.executeQuery();
-			ResultSetMetaData resultMetaData = (ResultSetMetaData) result.getMetaData();
+			resultSet = preparedStatement.executeQuery();
+			ResultSetMetaData resultMetaData = (ResultSetMetaData) resultSet.getMetaData();
 
 			int maxNumberOfColums = resultMetaData.getColumnCount();
 
-			while (result.next()) {
+			while (resultSet.next()) {
 				DataBaseRow row = new DataBaseRow();
 				for (int columnNumber = 1; columnNumber <= maxNumberOfColums; columnNumber++) {
 					DataBaseColumn column = new DataBaseColumn();
 
 					column.setColumnName(resultMetaData.getColumnName(columnNumber));
-					column.setColumnValue(result.getString(columnNumber));
+					column.setColumnValue(resultSet.getString(columnNumber));
 
 					row.addColumn(column);
 				}
@@ -136,8 +136,8 @@ public class MySQLConnector {
 			}
 
 		} finally {
-			if (result != null) {
-				result.close();
+			if (resultSet != null) {
+				resultSet.close();
 			}
 			if (preparedStatement != null) {
 				preparedStatement.close();
