@@ -72,6 +72,28 @@ public class MySQLConnector {
 		return isConnected;
 	}
 
+	public boolean commit() throws SQLException {
+		if(isConnected()) {
+			connection.commit();
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean rollback() throws SQLException {
+		if(isConnected()) {
+			connection.rollback();
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public Connection getConnection() {
+		return connection;
+	}
+	
 	/**
 	 * Insert, Update, Drop, Delete, Create, Alter query to MySQL database.
 	 */
@@ -89,10 +111,6 @@ public class MySQLConnector {
 		} finally {
 			if (preparedStatement != null) {
 				preparedStatement.close();
-			}
-			if (connection != null)
-			{
-				connection.close();
 			}
 		}
 	}
@@ -130,9 +148,6 @@ public class MySQLConnector {
 			}
 			if (preparedStatement != null) {
 				preparedStatement.close();
-			}
-			if (connection != null) {
-				connection.close();
 			}
 		}
 
