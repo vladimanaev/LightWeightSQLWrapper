@@ -24,7 +24,7 @@ import com.lightweight.mysql.exceptions.IllegalSQLQueryException;
 import com.lightweight.mysql.model.DataBaseColumn;
 import com.lightweight.mysql.model.DataBaseRow;
 import com.lightweight.mysql.model.MySQLQuery;
-import com.lightweight.mysql.model.Result;
+import com.lightweight.mysql.model.MySQLResult;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 import com.mysql.jdbc.ResultSetMetaData;
@@ -105,34 +105,28 @@ public class MySQLConnector {
 	/**
 	 * Select query to MySQL database.
 	 */
-	public Result executeSelectQuery(MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException, ClassNotFoundException {
-		Result mySQLResult = new Result();
+	public MySQLResult executeSelectQuery(MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException, ClassNotFoundException {
+		MySQLResult mySqlResult = new MySQLResult();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		try {
 			if (!isConnected()) {
 				open();
 			}
-
 			preparedStatement = (PreparedStatement) connection.prepareStatement(mySQLQuery.toString());
 			updatePreparedStatementWithParameters(preparedStatement, mySQLQuery);
 			resultSet = preparedStatement.executeQuery();
 			ResultSetMetaData resultMetaData = (ResultSetMetaData) resultSet.getMetaData();
 
-			int maxNumberOfColums = resultMetaData.getColumnCount();
+			int maxNumberOfColumns = resultMetaData.getColumnCount();
 
 			while (resultSet.next()) {
-				DataBaseRow row = new DataBaseRow();
-				for (int columnNumber = 1; columnNumber <= maxNumberOfColums; columnNumber++) {
-					DataBaseColumn column = new DataBaseColumn();
-
-					column.setColumnName(resultMetaData.getColumnName(columnNumber));
-					column.setColumnValue(resultSet.getString(columnNumber));
-
-					row.addColumn(column);
+				DataBaseRow currRow = new DataBaseRow();
+				for (int columnNumber = 1; columnNumber <= maxNumberOfColumns; columnNumber++) {
+					currRow.add(new DataBaseColumn(resultMetaData.getColumnName(columnNumber), resultSet.getString(columnNumber)));
 				}
 
-				mySQLResult.addRow(row);
+				mySqlResult.add(currRow);
 			}
 
 		} finally {
@@ -147,30 +141,37 @@ public class MySQLConnector {
 			}
 		}
 
-		return mySQLResult;
+		return mySqlResult;
 	}
 
 	/**
 	 * Creating prepared statement in order to avoid SQL injections
 	 */
 	private void updatePreparedStatementWithParameters(PreparedStatement preparedStatement, MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException {
-		// Databases counts from 1 and not 0 thats why there is (i + 1).
-		for (int i = 0; i < mySQLQuery.getNumberOfParameters(); i++) {
-			if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.STRING) {
-				preparedStatement.setString(i + 1, mySQLQuery.getParameterValue(i));
-
-			} else if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.INTEGER) {
-				preparedStatement.setInt(i + 1, Integer.parseInt(mySQLQuery.getParameterValue(i)));
-
-			} else if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.DOUBLE) {
-				preparedStatement.setDouble(i + 1, Double.parseDouble(mySQLQuery.getParameterValue(i)));
-
-			} else if (mySQLQuery.getParameterType(i) == MySQLQuery.ParameterType.FLOAT) {
-				preparedStatement.setFloat(i + 1, Float.parseFloat(mySQLQuery.getParameterValue(i)));
-
-			} else {
-				throw new IllegalSQLQueryException("Invalid type of ParameterType!");
+		try {
+			// Databases counts from 1 and not 0 thats why there is (i + 1).
+			for (int i = 0; i < mySQLQuery.getNumberOfParameters(); i++) {
+				MySQLQuery.Parameter parameter = mySQLQuery.getParameter(i);
+				switch (parameter.getParameterType()) {
+					case STRING:
+						preparedStatement.setString(i + 1, parameter.getValue());
+						break;
+					case INTEGER:
+						preparedStatement.setInt(i + 1, Integer.parseInt(parameter.getValue()));
+						break;
+					case DOUBLE:
+						preparedStatement.setDouble(i + 1, Double.parseDouble(parameter.getValue()));
+						break;
+					case FLOAT:
+						preparedStatement.setFloat(i + 1, Float.parseFloat(parameter.getValue()));
+						break;
+					default:
+						throw new IllegalSQLQueryException("Invalid type of ParameterType!");
+				}
 			}
+		}
+		catch(NumberFormatException e) {
+			throw new IllegalSQLQueryException(e);
 		}
 	}
 }

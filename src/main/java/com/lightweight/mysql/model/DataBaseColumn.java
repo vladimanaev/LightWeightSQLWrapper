@@ -16,6 +16,9 @@
 
 package com.lightweight.mysql.model;
 
+
+import java.util.Objects;
+
 /**
  * This class serve as column in MySQL database
  * 
@@ -23,23 +26,20 @@ package com.lightweight.mysql.model;
  */
 public class DataBaseColumn {
 	
-	private String columnName;
-	private String columnValue;
+	private final String columnName;
+	private final String columnValue;
+	
+	public DataBaseColumn(String columnName, String columnValue) {
+		this.columnName = columnName;
+		this.columnValue = columnValue;
+	}
 
 	public String getColumnName() {
 		return columnName;
 	}
 
-	public void setColumnName(String columnName) {
-		this.columnName = columnName;
-	}
-
 	public String getColumnValue() {
 		return columnValue;
-	}
-
-	public void setColumnValue(String columnValue) {
-		this.columnValue = columnValue;
 	}
 
 	@Override
@@ -47,5 +47,19 @@ public class DataBaseColumn {
 		return String.format("%s : %s", columnName, columnValue);
 	}
 
-	//TODO impl equals, hash
+	@Override
+	public int hashCode() {
+		return Objects.hash(columnName, columnValue);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		
+		final DataBaseColumn other = (DataBaseColumn) obj;
+		return Objects.equals(columnName, other.columnName) 
+			   && Objects.equals(columnValue, other.columnValue);
+	}
 }

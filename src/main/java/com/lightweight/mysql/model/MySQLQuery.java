@@ -16,8 +16,11 @@
 
 package com.lightweight.mysql.model;
 
-import java.util.ArrayList;
+import java.sql.Ref;
+import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class should serve as Query to MySQL database
@@ -26,41 +29,29 @@ import java.util.List;
  */
 public class MySQLQuery {
 
-	private String query;
-	private List<Parameter> parameters = new ArrayList<Parameter>();
-
+	private final String query;
+	private final List<Parameter> parameters = new LinkedList<Parameter>();
+	
 	public enum ParameterType {
 		STRING, INTEGER, DOUBLE, FLOAT
 	}
 
-	private class Parameter {
-		private String value;
-		private ParameterType parameterType;
+	public static class Parameter {
+		private final String value;
+		private final ParameterType parameterType;
 
 		public Parameter(String value, ParameterType parameterType) {
-			this.setValue(value);
-			this.setParameterType(parameterType);
+			this.value = value;
+			this.parameterType = parameterType;
 		}
 
 		public ParameterType getParameterType() {
 			return parameterType;
 		}
-		
-		public void setParameterType(ParameterType parameterType) {
-			this.parameterType = parameterType;
-		}
 
 		public String getValue() {
 			return value;
 		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-	}
-
-	public MySQLQuery() {
-		this.query = "";
 	}
 
 	public MySQLQuery(String queryString) {
@@ -72,44 +63,36 @@ public class MySQLQuery {
 	}
 
 	public void addParameter(String value, ParameterType parameterType) {
-		this.parameters.add(new Parameter(value, parameterType));
+		parameters.add(new Parameter(value, parameterType));
 	}
 
 	public void addStringParameter(String value) {
-		this.parameters.add(new Parameter(value, ParameterType.STRING));
+		addParameter(value, ParameterType.STRING);
 	}
 
 	public void addIntParameter(int value) {
-		this.parameters.add(new Parameter(Integer.toString(value), ParameterType.INTEGER));
+		addParameter(Integer.toString(value), ParameterType.INTEGER);
 	}
 
 	public void addDoubleParameter(double value) {
-		this.parameters.add(new Parameter(Double.toString(value), ParameterType.DOUBLE));
+		addParameter(Double.toString(value), ParameterType.DOUBLE);
 	}
 
 	public void addFloatParameter(float value) {
-		this.parameters.add(new Parameter(Float.toString(value), ParameterType.FLOAT));
+		addParameter(Float.toString(value), ParameterType.FLOAT);
 	}
 
-	public String getParameterValue(int index) {
-		return this.parameters.get(index).getValue();
-	}
-
-	public ParameterType getParameterType(int index) {
-		return this.parameters.get(index).getParameterType();
+	public Parameter getParameter(int index) {
+		return parameters.get(index);
 	}
 
 	public int getNumberOfParameters() {
-		return this.parameters.size();
-	}
-
-	public void setQueryString(String queryString) {
-		this.query = queryString;
+		return parameters.size();
 	}
 
 	@Override
 	public String toString() {
-		return this.query;
+		return query;
 	}
 
 	//TODO impl equals, hash

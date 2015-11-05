@@ -22,4 +22,12 @@ public class IllegalSQLQueryException extends Exception {
 	public IllegalSQLQueryException(String msg) {
 		super(msg);
 	}
+
+	public IllegalSQLQueryException(Throwable e) {
+		super(e);
+	}
+	
+	public IllegalSQLQueryException(String msg, Throwable e) {
+		super(msg, e);
+	}
 }
