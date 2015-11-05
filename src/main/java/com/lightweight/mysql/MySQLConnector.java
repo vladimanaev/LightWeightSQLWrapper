@@ -16,18 +16,13 @@
 
 package com.lightweight.mysql;
 
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import com.lightweight.mysql.exceptions.IllegalSQLQueryException;
-import com.lightweight.mysql.model.DataBaseColumn;
-import com.lightweight.mysql.model.DataBaseRow;
+import com.lightweight.mysql.model.MySQLColumn;
+import com.lightweight.mysql.model.MySQLRow;
 import com.lightweight.mysql.model.MySQLQuery;
 import com.lightweight.mysql.model.MySQLResult;
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.ResultSetMetaData;
+
+import java.sql.*;
 
 /**
  * This class should serve as adapter to MySQL database
@@ -50,9 +45,9 @@ public class MySQLConnector {
 	/**
 	 * Opens connection to MySQL database
 	 */
-	public void open() throws SQLException, ClassNotFoundException {
+	public void open() throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.jdbc.Driver");
-		connection = (Connection) DriverManager.getConnection(url, user, password);
+		connection = DriverManager.getConnection(url, user, password);
 	}
 
 	/**
@@ -87,7 +82,7 @@ public class MySQLConnector {
 				open();
 			}
 
-			preparedStatement = (PreparedStatement) connection.prepareStatement(mySQLQuery.toString());
+			preparedStatement = connection.prepareStatement(mySQLQuery.toString());
 			updatePreparedStatementWithParameters(preparedStatement, mySQLQuery);
 			preparedStatement.executeUpdate();
 
@@ -105,7 +100,7 @@ public class MySQLConnector {
 	/**
 	 * Select query to MySQL database.
 	 */
-	public MySQLResult executeSelectQuery(MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException, ClassNotFoundException {
+	public MySQLResult executeSelectQuery(MySQLQuery mySQLQuery) throws IllegalSQLQueryException, ClassNotFoundException, SQLException {
 		MySQLResult mySqlResult = new MySQLResult();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -113,17 +108,17 @@ public class MySQLConnector {
 			if (!isConnected()) {
 				open();
 			}
-			preparedStatement = (PreparedStatement) connection.prepareStatement(mySQLQuery.toString());
+			preparedStatement = connection.prepareStatement(mySQLQuery.toString());
 			updatePreparedStatementWithParameters(preparedStatement, mySQLQuery);
 			resultSet = preparedStatement.executeQuery();
-			ResultSetMetaData resultMetaData = (ResultSetMetaData) resultSet.getMetaData();
+			ResultSetMetaData resultMetaData = resultSet.getMetaData();
 
 			int maxNumberOfColumns = resultMetaData.getColumnCount();
 
 			while (resultSet.next()) {
-				DataBaseRow currRow = new DataBaseRow();
+				MySQLRow currRow = new MySQLRow();
 				for (int columnNumber = 1; columnNumber <= maxNumberOfColumns; columnNumber++) {
-					currRow.add(new DataBaseColumn(resultMetaData.getColumnName(columnNumber), resultSet.getString(columnNumber)));
+					currRow.add(new MySQLColumn(resultMetaData.getColumnName(columnNumber), resultSet.getString(columnNumber)));
 				}
 
 				mySqlResult.add(currRow);
@@ -145,33 +140,42 @@ public class MySQLConnector {
 	}
 
 	/**
-	 * Creating prepared statement in order to avoid SQL injections
+	 * Handling prepared statement and avoiding SQL injections
 	 */
 	private void updatePreparedStatementWithParameters(PreparedStatement preparedStatement, MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException {
-		try {
-			// Databases counts from 1 and not 0 thats why there is (i + 1).
+
 			for (int i = 0; i < mySQLQuery.getNumberOfParameters(); i++) {
-				MySQLQuery.Parameter parameter = mySQLQuery.getParameter(i);
-				switch (parameter.getParameterType()) {
-					case STRING:
-						preparedStatement.setString(i + 1, parameter.getValue());
+				MySQLQuery.PreparedStatementParameter currParameter = mySQLQuery.getParameter(i);
+				int currentIndex = i + 1;
+				switch (currParameter.getJdbcType()) {
+					case BOOLEAN:
+					case TINYINT:
+						preparedStatement.setBoolean(currentIndex, Boolean.parseBoolean(currParameter.getValue()));
 						break;
 					case INTEGER:
-						preparedStatement.setInt(i + 1, Integer.parseInt(parameter.getValue()));
+						preparedStatement.setInt(currentIndex, Integer.parseInt(currParameter.getValue()));
 						break;
-					case DOUBLE:
-						preparedStatement.setDouble(i + 1, Double.parseDouble(parameter.getValue()));
+					case BIGINT:
+						preparedStatement.setLong(currentIndex, Long.parseLong(currParameter.getValue()));
 						break;
 					case FLOAT:
-						preparedStatement.setFloat(i + 1, Float.parseFloat(parameter.getValue()));
+						preparedStatement.setFloat(currentIndex, Float.parseFloat(currParameter.getValue()));
+						break;
+					case DOUBLE:
+						preparedStatement.setDouble(currentIndex, Double.parseDouble(currParameter.getValue()));
+						break;
+					case CHAR:
+					case VARCHAR:
+					case LONGVARCHAR:
+						preparedStatement.setString(currentIndex, currParameter.getValue());
+						break;
+					case DATE:
+					case TIMESTAMP:
+						preparedStatement.setDate(currentIndex, new Date(Long.parseLong(currParameter.getValue())));
 						break;
 					default:
-						throw new IllegalSQLQueryException("Invalid type of ParameterType!");
+						throw new IllegalSQLQueryException("Unsupported JDBC type");
 				}
 			}
-		}
-		catch(NumberFormatException e) {
-			throw new IllegalSQLQueryException(e);
-		}
 	}
 }

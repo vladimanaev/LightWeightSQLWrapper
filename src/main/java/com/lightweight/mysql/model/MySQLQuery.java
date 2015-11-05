@@ -16,11 +16,9 @@
 
 package com.lightweight.mysql.model;
 
-import java.sql.Ref;
-import java.sql.SQLException;
+import java.sql.JDBCType;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class should serve as Query to MySQL database
@@ -30,23 +28,19 @@ import java.util.Map;
 public class MySQLQuery {
 
 	private final String query;
-	private final List<Parameter> parameters = new LinkedList<Parameter>();
+	private final List<PreparedStatementParameter> parameters = new LinkedList<PreparedStatementParameter>();
 	
-	public enum ParameterType {
-		STRING, INTEGER, DOUBLE, FLOAT
-	}
-
-	public static class Parameter {
+	public static class PreparedStatementParameter {
 		private final String value;
-		private final ParameterType parameterType;
+		private final JDBCType jdbcType;
 
-		public Parameter(String value, ParameterType parameterType) {
+		public PreparedStatementParameter(String value, JDBCType jdbcType) {
 			this.value = value;
-			this.parameterType = parameterType;
+			this.jdbcType = jdbcType;
 		}
 
-		public ParameterType getParameterType() {
-			return parameterType;
+		public JDBCType getJdbcType() {
+			return jdbcType;
 		}
 
 		public String getValue() {
@@ -58,31 +52,15 @@ public class MySQLQuery {
 		this.query = queryString;
 	}
 	
-	public void addParameters(List<Parameter> parameters) {
+	public void addParameters(List<PreparedStatementParameter> parameters) {
 		this.parameters.addAll(parameters);
 	}
 
-	public void addParameter(String value, ParameterType parameterType) {
-		parameters.add(new Parameter(value, parameterType));
+	public void addParameter(String value, JDBCType jdbcType) {
+		parameters.add(new PreparedStatementParameter(value, jdbcType));
 	}
 
-	public void addStringParameter(String value) {
-		addParameter(value, ParameterType.STRING);
-	}
-
-	public void addIntParameter(int value) {
-		addParameter(Integer.toString(value), ParameterType.INTEGER);
-	}
-
-	public void addDoubleParameter(double value) {
-		addParameter(Double.toString(value), ParameterType.DOUBLE);
-	}
-
-	public void addFloatParameter(float value) {
-		addParameter(Float.toString(value), ParameterType.FLOAT);
-	}
-
-	public Parameter getParameter(int index) {
+	public PreparedStatementParameter getParameter(int index) {
 		return parameters.get(index);
 	}
 

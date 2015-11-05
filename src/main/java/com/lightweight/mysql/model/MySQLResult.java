@@ -23,14 +23,14 @@ import java.util.ArrayList;
  * 
  * @author Vladi - 07:30 PM 9/12/2013
  */
-public class MySQLResult extends ArrayList<DataBaseRow> {
+public class MySQLResult extends ArrayList<MySQLRow> {
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		for(DataBaseRow curr : this) {
+		for(MySQLRow curr : this) {
 			builder.append(curr.toString());
-			builder.append("\n");
+			builder.append(System.getProperty("line.separator"));
 		}
 		
 		return builder.toString();

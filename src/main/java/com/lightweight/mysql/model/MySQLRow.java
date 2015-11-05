@@ -16,50 +16,24 @@
 
 package com.lightweight.mysql.model;
 
-
-import java.util.Objects;
+import java.util.ArrayList;
 
 /**
- * This class serve as column in MySQL database
+ * This class serve as row in MySQL database
  * 
  * @author Vladi - 01:59 PM 9/12/2013
  */
-public class DataBaseColumn {
+public class MySQLRow extends ArrayList<MySQLColumn> {
 	
-	private final String columnName;
-	private final String columnValue;
-	
-	public DataBaseColumn(String columnName, String columnValue) {
-		this.columnName = columnName;
-		this.columnValue = columnValue;
-	}
-
-	public String getColumnName() {
-		return columnName;
-	}
-
-	public String getColumnValue() {
-		return columnValue;
-	}
-
 	@Override
 	public String toString() {
-		return String.format("%s : %s", columnName, columnValue);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(columnName, columnValue);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if(obj == null || getClass() != obj.getClass()) {
-			return false;
+		StringBuilder builder = new StringBuilder();
+		builder.append(" | ");
+		for(MySQLColumn curr : this) {
+			builder.append(curr.toString());
+			builder.append(" | ");
 		}
 		
-		final DataBaseColumn other = (DataBaseColumn) obj;
-		return Objects.equals(columnName, other.columnName) 
-			   && Objects.equals(columnValue, other.columnValue);
+		return builder.toString();
 	}
 }
