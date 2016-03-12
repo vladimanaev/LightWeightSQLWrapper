@@ -27,5 +27,5 @@ import java.sql.SQLException;
  */
 public interface DriverManagerWrapper {
 
-    Connection getConnection(String url, String user, String password) throws SQLException;
+    Connection getConnection() throws SQLException;
 }

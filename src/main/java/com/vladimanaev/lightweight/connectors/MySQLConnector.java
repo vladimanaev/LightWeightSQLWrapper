@@ -33,16 +33,10 @@ import java.sql.*;
 public class MySQLConnector implements SQLConnector {
 	private Connection connection = null;
 
-	private String url;
-	private String user;
-	private String password;
     private DriverManagerWrapper driverManagerWrapper;
 
-	public MySQLConnector(DriverManagerWrapper driverManagerWrapper, String url, String user, String password) {
+	public MySQLConnector(DriverManagerWrapper driverManagerWrapper) {
         this.driverManagerWrapper = driverManagerWrapper;
-		this.url = url;
-		this.user = user;
-		this.password = password;
 	}
 
 	/**
@@ -50,7 +44,7 @@ public class MySQLConnector implements SQLConnector {
 	 */
     @Override
 	public void open() throws SQLException {
-		connection = driverManagerWrapper.getConnection(url, user, password);
+		connection = driverManagerWrapper.getConnection();
 	}
 
 	/**

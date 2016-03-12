@@ -38,10 +38,6 @@ import static org.mockito.Mockito.when;
  */
 public class MySQLConnectorTest {
 
-    private String url = "test-url";
-    private String username = "test-username";
-    private String password = "test-password";
-
     @Test
     public void testSimpleSelect() throws Exception {
         final int numOfRows = 2;
@@ -60,7 +56,7 @@ public class MySQLConnectorTest {
         final ResultSet resultSetMock = mock(ResultSet.class);
         final ResultSetMetaData resultSetMetaDataMock = mock(ResultSetMetaData.class);
 
-        when(driverManagerWrapperMock.getConnection(url, username, password)).thenReturn(connectionMock);
+        when(driverManagerWrapperMock.getConnection()).thenReturn(connectionMock);
         when(connectionMock.prepareStatement(query.toString())).thenReturn(preparedStatementMock);
         when(preparedStatementMock.executeQuery()).thenReturn(resultSetMock);
         when(resultSetMock.getMetaData()).thenReturn(resultSetMetaDataMock);
@@ -82,7 +78,7 @@ public class MySQLConnectorTest {
             }
         });
 
-        MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock, url, username, password);
+        MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock);
         Result rows = mySQLConnector.executeSelectQuery(query);
 
         verify(resultSetMock).close();
@@ -112,10 +108,10 @@ public class MySQLConnectorTest {
         final Connection connectionMock = mock(Connection.class);
         final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
 
-        when(driverManagerWrapperMock.getConnection(url, username, password)).thenReturn(connectionMock);
+        when(driverManagerWrapperMock.getConnection()).thenReturn(connectionMock);
         when(connectionMock.prepareStatement(query.toString())).thenReturn(preparedStatementMock);
 
-        MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock, url, username, password);
+        MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock);
         mySQLConnector.executeUpdateQuery(query);
 
         verify(preparedStatementMock).close();
@@ -141,10 +137,10 @@ public class MySQLConnectorTest {
         final Connection connectionMock = mock(Connection.class);
         final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
 
-        when(driverManagerWrapperMock.getConnection(url, username, password)).thenReturn(connectionMock);
+        when(driverManagerWrapperMock.getConnection()).thenReturn(connectionMock);
         when(connectionMock.prepareStatement(query.toString())).thenReturn(preparedStatementMock);
 
-        MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock, url, username, password);
+        MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock);
         mySQLConnector.executeUpdateQuery(query);
 
         verify(preparedStatementMock).close();

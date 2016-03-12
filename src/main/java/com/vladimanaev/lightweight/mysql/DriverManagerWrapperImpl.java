@@ -16,6 +16,8 @@
 
 package com.vladimanaev.lightweight.mysql;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -28,13 +30,63 @@ import java.sql.SQLException;
  */
 public class DriverManagerWrapperImpl implements DriverManagerWrapper {
 
+    private static final String DRIVER_NAME = "com.mysql.jdbc.Driver";
+
+    private BasicDataSource basicDataSource;
+
+    private final String url;
+    private final String user;
+    private final String password;
+
+    public static DriverManagerWrapperImpl withoutConnectionPool(String url, String user, String password) {
+        return new DriverManagerWrapperImpl(url, user, password);
+    }
+
+    public static DriverManagerWrapperImpl withConnectionPool(String url, String user, String password, int size) {
+        return new DriverManagerWrapperImpl(url, user, password, size);
+    }
+
+    public DriverManagerWrapperImpl(String url, String user, String password) {
+        this.url = url;
+        this.user = user;
+        this.password = password;
+    }
+
+    public DriverManagerWrapperImpl(String url, String user, String password, int size) {
+        this(url, user, password);
+
+        basicDataSource = new BasicDataSource();
+        basicDataSource.setDriverClassName(DRIVER_NAME);
+        basicDataSource.setUrl(url);
+        basicDataSource.setUsername(user);
+        basicDataSource.setPassword(password);
+        basicDataSource.setInitialSize(size);
+    }
+
     @Override
-    public Connection getConnection(String url, String user, String password) throws SQLException {
+    public Connection getConnection() throws SQLException {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            return DriverManager.getConnection(url, user, password);
+            if(isUsingConnectionPool()) {
+                return getConnectionFromPool();
+            }
+
+            return getNewConnection(url, user, password);
+
         } catch(ClassNotFoundException e) {
-            throw new SQLException("Missing 'com.mysql.jdbc.Driver'", e);
+            throw new SQLException(String.format("Missing '%s'", DRIVER_NAME), e);
         }
+    }
+
+    private Connection getConnectionFromPool() throws SQLException {
+        return basicDataSource.getConnection();
+    }
+
+    private boolean isUsingConnectionPool() {
+        return basicDataSource != null;
+    }
+
+    private Connection getNewConnection(String url, String user, String password) throws ClassNotFoundException, SQLException {
+        Class.forName(DRIVER_NAME);
+        return DriverManager.getConnection(url, user, password);
     }
 }
