@@ -14,24 +14,23 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.lightweight.mysql.model;
+package com.vladimanaev.lightweight.mysql.model;
 
 import java.util.ArrayList;
 
 /**
- * This class serve as row in MySQL database
+ * This class should serve as Result from MySQL database query
  * 
- * @author Vladi - 01:59 PM 9/12/2013
+ * @author Vladi - 07:30 PM 9/12/2013
  */
-public class MySQLRow extends ArrayList<MySQLColumn> {
-	
+public class MySQLResult extends ArrayList<MySQLRow> {
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(" | ");
-		for(MySQLColumn curr : this) {
+		for(MySQLRow curr : this) {
 			builder.append(curr.toString());
-			builder.append(" | ");
+			builder.append(System.getProperty("line.separator"));
 		}
 		
 		return builder.toString();

@@ -14,13 +14,13 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.lightweight.mysql;
+package com.vladimanaev.lightweight.mysql;
 
-import com.lightweight.mysql.exceptions.IllegalSQLQueryException;
-import com.lightweight.mysql.model.MySQLColumn;
-import com.lightweight.mysql.model.MySQLRow;
-import com.lightweight.mysql.model.MySQLQuery;
-import com.lightweight.mysql.model.MySQLResult;
+import com.vladimanaev.lightweight.mysql.exceptions.IllegalSQLQueryException;
+import com.vladimanaev.lightweight.mysql.model.MySQLColumn;
+import com.vladimanaev.lightweight.mysql.model.MySQLRow;
+import com.vladimanaev.lightweight.mysql.model.MySQLQuery;
+import com.vladimanaev.lightweight.mysql.model.MySQLResult;
 
 import java.sql.*;
 

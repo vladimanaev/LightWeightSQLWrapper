@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.lightweight</groupId>
+    <groupId>com.vladimanaev</groupId>
     <artifactId>lightweight-sql-wrapper</artifactId>
     <version>2.0</version>
     <packaging>jar</packaging>
@@ -22,6 +22,31 @@
     <scm>
         <url>http://svn.apache.org/viewvc/maven</url>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-vadimmanaev-maven</id>
+            <name>vadimmanaev-maven</name>
+            <url>https://api.bintray.com/maven/vadimmanaev/maven/LightWeightSQLWrapper/;publish=1</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <properties>
         <java.version>1.8</java.version>

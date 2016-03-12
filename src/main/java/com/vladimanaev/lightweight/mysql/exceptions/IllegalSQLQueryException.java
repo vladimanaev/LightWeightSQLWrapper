@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.lightweight.mysql.exceptions;
+package com.vladimanaev.lightweight.mysql.exceptions;
 
 public class IllegalSQLQueryException extends Exception {
 	private static final long serialVersionUID = -4558850917607742767L;

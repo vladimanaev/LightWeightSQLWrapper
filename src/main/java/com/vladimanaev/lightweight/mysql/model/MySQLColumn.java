@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.lightweight.mysql.model;
+package com.vladimanaev.lightweight.mysql.model;
 
 
 import java.util.Objects;
