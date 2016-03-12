@@ -14,13 +14,14 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.vladimanaev.lightweight.mysql;
+package com.vladimanaev.lightweight.connectors;
 
-import com.vladimanaev.lightweight.mysql.exceptions.IllegalSQLQueryException;
-import com.vladimanaev.lightweight.mysql.model.MySQLColumn;
-import com.vladimanaev.lightweight.mysql.model.MySQLRow;
-import com.vladimanaev.lightweight.mysql.model.MySQLQuery;
-import com.vladimanaev.lightweight.mysql.model.MySQLResult;
+import com.vladimanaev.lightweight.exceptions.IllegalSQLQueryException;
+import com.vladimanaev.lightweight.model.Column;
+import com.vladimanaev.lightweight.model.Query;
+import com.vladimanaev.lightweight.model.Result;
+import com.vladimanaev.lightweight.model.Row;
+import com.vladimanaev.lightweight.mysql.DriverManagerWrapper;
 
 import java.sql.*;
 
@@ -29,14 +30,16 @@ import java.sql.*;
  * @version 2.0
  * @author Vladi - 8:09 PM 9/12/2013
 */
-public class MySQLConnector {
+public class MySQLConnector implements SQLConnector {
 	private Connection connection = null;
 
 	private String url;
 	private String user;
 	private String password;
+    private DriverManagerWrapper driverManagerWrapper;
 
-	public MySQLConnector(String url, String user, String password) {
+	public MySQLConnector(DriverManagerWrapper driverManagerWrapper, String url, String user, String password) {
+        this.driverManagerWrapper = driverManagerWrapper;
 		this.url = url;
 		this.user = user;
 		this.password = password;
@@ -45,15 +48,16 @@ public class MySQLConnector {
 	/**
 	 * Opens connection to MySQL database
 	 */
+    @Override
 	public void open() throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.jdbc.Driver");
-		connection = DriverManager.getConnection(url, user, password);
+		connection = driverManagerWrapper.getConnection(url, user, password);
 	}
 
 	/**
 	 * Closing connection to MySQL database
 	 */
-	public void close() throws SQLException {
+    @Override
+    public void close() throws SQLException {
 		if (connection != null) {
 			connection.close();
 		}
@@ -62,7 +66,8 @@ public class MySQLConnector {
 	/**
 	 * Checks if connection to Database is open
 	 */
-	public boolean isConnected() throws SQLException {
+    @Override
+    public boolean isConnected() throws SQLException {
 		boolean isConnected = false;
 
 		if (connection != null) {
@@ -72,7 +77,8 @@ public class MySQLConnector {
 		return isConnected;
 	}
 
-	public boolean commit() throws SQLException {
+    @Override
+    public boolean commit() throws SQLException {
 		if(isConnected()) {
 			connection.commit();
 			return true;
@@ -81,7 +87,8 @@ public class MySQLConnector {
 		return false;
 	}
 
-	public boolean rollback() throws SQLException {
+    @Override
+    public boolean rollback() throws SQLException {
 		if(isConnected()) {
 			connection.rollback();
 			return true;
@@ -89,23 +96,25 @@ public class MySQLConnector {
 		
 		return false;
 	}
-	
-	public Connection getConnection() {
+
+    @Override
+    public Connection getConnection() {
 		return connection;
 	}
 	
 	/**
 	 * Insert, Update, Drop, Delete, Create, Alter query to MySQL database.
 	 */
-	public void executeUpdateQuery(MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException, ClassNotFoundException {
+    @Override
+    public void executeUpdateQuery(Query query) throws SQLException, IllegalSQLQueryException, ClassNotFoundException {
 		PreparedStatement preparedStatement = null;
 		try {
 			if (!isConnected()) {
 				open();
 			}
 
-			preparedStatement = connection.prepareStatement(mySQLQuery.toString());
-			updatePreparedStatementWithParameters(preparedStatement, mySQLQuery);
+			preparedStatement = connection.prepareStatement(query.toString());
+			updatePreparedStatementWithParameters(preparedStatement, query);
 			preparedStatement.executeUpdate();
 
 		} finally {
@@ -118,28 +127,29 @@ public class MySQLConnector {
 	/**
 	 * Select query to MySQL database.
 	 */
-	public MySQLResult executeSelectQuery(MySQLQuery mySQLQuery) throws IllegalSQLQueryException, ClassNotFoundException, SQLException {
-		MySQLResult mySqlResult = new MySQLResult();
+    @Override
+    public Result executeSelectQuery(Query query) throws IllegalSQLQueryException, ClassNotFoundException, SQLException {
+		Result result = new Result();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		try {
 			if (!isConnected()) {
 				open();
 			}
-			preparedStatement = connection.prepareStatement(mySQLQuery.toString());
-			updatePreparedStatementWithParameters(preparedStatement, mySQLQuery);
+			preparedStatement = connection.prepareStatement(query.toString());
+			updatePreparedStatementWithParameters(preparedStatement, query);
 			resultSet = preparedStatement.executeQuery();
 			ResultSetMetaData resultMetaData = resultSet.getMetaData();
 
 			int maxNumberOfColumns = resultMetaData.getColumnCount();
 
 			while (resultSet.next()) {
-				MySQLRow currRow = new MySQLRow();
+				Row currRow = new Row();
 				for (int columnNumber = 1; columnNumber <= maxNumberOfColumns; columnNumber++) {
-					currRow.add(new MySQLColumn(resultMetaData.getColumnName(columnNumber), resultSet.getString(columnNumber)));
+					currRow.add(new Column(resultMetaData.getColumnName(columnNumber), resultSet.getString(columnNumber)));
 				}
 
-				mySqlResult.add(currRow);
+				result.add(currRow);
 			}
 
 		} finally {
@@ -151,16 +161,16 @@ public class MySQLConnector {
 			}
 		}
 
-		return mySqlResult;
+		return result;
 	}
 
 	/**
 	 * Handling prepared statement and avoiding SQL injections
 	 */
-	private void updatePreparedStatementWithParameters(PreparedStatement preparedStatement, MySQLQuery mySQLQuery) throws SQLException, IllegalSQLQueryException {
+	private void updatePreparedStatementWithParameters(PreparedStatement preparedStatement, Query Query) throws SQLException, IllegalSQLQueryException {
 
-			for (int i = 0; i < mySQLQuery.getNumberOfParameters(); i++) {
-				MySQLQuery.PreparedStatementParameter currParameter = mySQLQuery.getParameter(i);
+			for (int i = 0; i < Query.getNumberOfParameters(); i++) {
+				Query.PreparedStatementParameter currParameter = Query.getParameter(i);
 				int currentIndex = i + 1;
 				switch (currParameter.getJdbcType()) {
 					case BOOLEAN:
@@ -186,7 +196,7 @@ public class MySQLConnector {
 						break;
 					case DATE:
 					case TIMESTAMP:
-						preparedStatement.setDate(currentIndex, new Date(Long.parseLong(currParameter.getValue())));
+						preparedStatement.setDate(currentIndex, Date.valueOf((currParameter.getValue())));
 						break;
 					default:
 						throw new IllegalSQLQueryException("Unsupported JDBC type");

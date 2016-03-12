@@ -14,20 +14,26 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.vladimanaev.lightweight.mysql.exceptions;
+package com.vladimanaev.lightweight.model;
 
-public class IllegalSQLQueryException extends Exception {
-	private static final long serialVersionUID = -4558850917607742767L;
+import java.util.ArrayList;
 
-	public IllegalSQLQueryException(String msg) {
-		super(msg);
-	}
-
-	public IllegalSQLQueryException(Throwable e) {
-		super(e);
-	}
+/**
+ * This class serve as row in MySQL database
+ * 
+ * @author Vladi - 01:59 PM 9/12/2013
+ */
+public class Row extends ArrayList<Column> {
 	
-	public IllegalSQLQueryException(String msg, Throwable e) {
-		super(msg, e);
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(" | ");
+		for(Column curr : this) {
+			builder.append(curr.toString());
+			builder.append(" | ");
+		}
+		
+		return builder.toString();
 	}
 }

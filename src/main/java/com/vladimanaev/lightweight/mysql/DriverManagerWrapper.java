@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2013
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,25 +14,18 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.vladimanaev.lightweight.mysql.model;
+package com.vladimanaev.lightweight.mysql;
 
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
- * This class should serve as Result from MySQL database query
- * 
- * @author Vladi - 07:30 PM 9/12/2013
+ * Created by Vladi
+ * Date: 3/12/2016
+ * Time: 8:38 PM
+ * Copyright VMSR
  */
-public class MySQLResult extends ArrayList<MySQLRow> {
+public interface DriverManagerWrapper {
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		for(MySQLRow curr : this) {
-			builder.append(curr.toString());
-			builder.append(System.getProperty("line.separator"));
-		}
-		
-		return builder.toString();
-	}
+    Connection getConnection(String url, String user, String password) throws ClassNotFoundException, SQLException;
 }

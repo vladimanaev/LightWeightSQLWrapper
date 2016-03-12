@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.vladimanaev.lightweight.mysql.model;
+package com.vladimanaev.lightweight.model;
 
 
 import java.util.Objects;
@@ -24,12 +24,12 @@ import java.util.Objects;
  * 
  * @author Vladi - 01:59 PM 9/12/2013
  */
-public class MySQLColumn {
+public class Column {
 	
 	private final String columnName;
 	private final String columnValue;
 	
-	public MySQLColumn(String columnName, String columnValue) {
+	public Column(String columnName, String columnValue) {
 		this.columnName = columnName;
 		this.columnValue = columnValue;
 	}
@@ -58,7 +58,7 @@ public class MySQLColumn {
 			return false;
 		}
 		
-		final MySQLColumn other = (MySQLColumn) obj;
+		final Column other = (Column) obj;
 		return Objects.equals(columnName, other.columnName) 
 			   && Objects.equals(columnValue, other.columnValue);
 	}

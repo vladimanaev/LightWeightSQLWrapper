@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.vladimanaev.lightweight.mysql.model;
+package com.vladimanaev.lightweight.model;
 
 import java.sql.JDBCType;
 import java.util.LinkedList;
@@ -25,7 +25,7 @@ import java.util.List;
  * 
  * @author Vladi - 01:09 AM 9/12/2013
  */
-public class MySQLQuery {
+public class Query {
 
 	private final String query;
 	private final List<PreparedStatementParameter> parameters = new LinkedList<PreparedStatementParameter>();
@@ -68,7 +68,7 @@ public class MySQLQuery {
         }
     }
 
-	public MySQLQuery(String queryString) {
+	public Query(String queryString) {
 		this.query = queryString;
 	}
 	
@@ -98,7 +98,7 @@ public class MySQLQuery {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MySQLQuery that = (MySQLQuery) o;
+        Query that = (Query) o;
 
         if (parameters != null ? !parameters.equals(that.parameters) : that.parameters != null) return false;
         if (query != null ? !query.equals(that.query) : that.query != null) return false;
