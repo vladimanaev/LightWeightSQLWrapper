@@ -26,5 +26,10 @@ Dependencies
 	<artifactId>mysql-connector-java</artifactId>
 	<version>5.1.6</version>
 </dependency>
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-dbcp2</artifactId>
+    <version>2.1.1</version>
+</dependency>
 ```
 
