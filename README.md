@@ -1,4 +1,4 @@
-Lightweight MySQL wrapper
+Lightweight SQL wrapper
 =====================
 
 Lightweight mysql driver wrapper which let you connect faster and easier to an existing database.
