@@ -29,8 +29,12 @@ import java.sql.SQLException;
 public class DriverManagerWrapperImpl implements DriverManagerWrapper {
 
     @Override
-    public Connection getConnection(String url, String user, String password) throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.jdbc.Driver");
-        return DriverManager.getConnection(url, user, password);
+    public Connection getConnection(String url, String user, String password) throws SQLException {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            return DriverManager.getConnection(url, user, password);
+        } catch(ClassNotFoundException e) {
+            throw new SQLException("Missing 'com.mysql.jdbc.Driver'", e);
+        }
     }
 }

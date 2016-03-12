@@ -49,7 +49,7 @@ public class MySQLConnector implements SQLConnector {
 	 * Opens connection to MySQL database
 	 */
     @Override
-	public void open() throws ClassNotFoundException, SQLException {
+	public void open() throws SQLException {
 		connection = driverManagerWrapper.getConnection(url, user, password);
 	}
 
@@ -106,7 +106,7 @@ public class MySQLConnector implements SQLConnector {
 	 * Insert, Update, Drop, Delete, Create, Alter query to MySQL database.
 	 */
     @Override
-    public void executeUpdateQuery(Query query) throws SQLException, IllegalSQLQueryException, ClassNotFoundException {
+    public void executeUpdateQuery(Query query) throws SQLException {
 		PreparedStatement preparedStatement = null;
 		try {
 			if (!isConnected()) {
@@ -128,7 +128,7 @@ public class MySQLConnector implements SQLConnector {
 	 * Select query to MySQL database.
 	 */
     @Override
-    public Result executeSelectQuery(Query query) throws IllegalSQLQueryException, ClassNotFoundException, SQLException {
+    public Result executeSelectQuery(Query query) throws SQLException {
 		Result result = new Result();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -167,7 +167,7 @@ public class MySQLConnector implements SQLConnector {
 	/**
 	 * Handling prepared statement and avoiding SQL injections
 	 */
-	private void updatePreparedStatementWithParameters(PreparedStatement preparedStatement, Query Query) throws SQLException, IllegalSQLQueryException {
+	private void updatePreparedStatementWithParameters(PreparedStatement preparedStatement, Query Query) throws SQLException {
 
 			for (int i = 0; i < Query.getNumberOfParameters(); i++) {
 				Query.PreparedStatementParameter currParameter = Query.getParameter(i);

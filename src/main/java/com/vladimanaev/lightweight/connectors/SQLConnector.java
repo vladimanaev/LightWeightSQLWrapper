@@ -16,7 +16,6 @@
 
 package com.vladimanaev.lightweight.connectors;
 
-import com.vladimanaev.lightweight.exceptions.IllegalSQLQueryException;
 import com.vladimanaev.lightweight.model.Query;
 import com.vladimanaev.lightweight.model.Result;
 
@@ -31,7 +30,7 @@ import java.sql.SQLException;
  */
 public interface SQLConnector {
 
-    void open() throws ClassNotFoundException, SQLException;
+    void open() throws SQLException;
 
     void close() throws SQLException;
 
@@ -43,8 +42,8 @@ public interface SQLConnector {
 
     Connection getConnection();
 
-    void executeUpdateQuery(Query Query) throws IllegalSQLQueryException, ClassNotFoundException, SQLException;
+    void executeUpdateQuery(Query Query) throws SQLException;
 
-    Result executeSelectQuery(Query Query) throws IllegalSQLQueryException, ClassNotFoundException, SQLException;
+    Result executeSelectQuery(Query Query) throws SQLException;
 
 }

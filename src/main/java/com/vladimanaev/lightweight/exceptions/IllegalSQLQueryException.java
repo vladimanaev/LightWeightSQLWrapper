@@ -16,7 +16,9 @@
 
 package com.vladimanaev.lightweight.exceptions;
 
-public class IllegalSQLQueryException extends Exception {
+import java.sql.SQLException;
+
+public class IllegalSQLQueryException extends SQLException {
 	private static final long serialVersionUID = -4558850917607742767L;
 
 	public IllegalSQLQueryException(String msg) {
