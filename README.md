@@ -1,6 +1,7 @@
 Lightweight SQL wrapper
 =====================
 
+
 Lightweight mysql driver wrapper which let you connect faster and easier to an existing database.
 
 If your project is built with Maven add following to your pom file:
