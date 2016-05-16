@@ -9,7 +9,6 @@ If your project is built with Maven add following to your pom file:
     <groupId>com.vladimanaev</groupId>
     <artifactId>lightweight-sql-wrapper</artifactId>
     <version>2.1</version>
-    <type>pom</type>
 </dependency>
 ```
 
