@@ -13,19 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-
 package com.vladimanaev.lightweight.connectors;
+
+import com.vladimanaev.lightweight.model.Query;
+import com.vladimanaev.lightweight.model.Result;
 
 import java.sql.SQLException;
 
 /**
  * Created by Vladi
- * Date: 3/12/2016
- * Time: 8:11 PM
+ * Date: 5/20/2016
+ * Time: 1:12 AM
  * Copyright VMSR
  */
-public interface SQLConnector {
+public interface ExecutableConnection extends AutoCloseable {
 
-    ExecutableConnection getConnection() throws SQLException;
+    void executeUpdateQuery(Query query) throws SQLException;
+
+    Result executeSelectQuery(Query query) throws SQLException;
+
+    void commit() throws SQLException;
+
+    void rollback() throws SQLException;
 
 }

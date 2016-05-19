@@ -79,7 +79,7 @@ public class MySQLConnectorTest {
         });
 
         MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock);
-        Result rows = mySQLConnector.executeSelectQuery(query);
+        Result rows = mySQLConnector.getConnection().executeSelectQuery(query);
 
         verify(resultSetMock).close();
         verify(preparedStatementMock).close();
@@ -124,7 +124,7 @@ public class MySQLConnectorTest {
         when(connectionMock.prepareStatement(query.toString())).thenReturn(preparedStatementMock);
 
         MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock);
-        mySQLConnector.executeUpdateQuery(query);
+        mySQLConnector.getConnection().executeUpdateQuery(query);
 
         verify(preparedStatementMock).close();
         verify(preparedStatementMock).setBoolean(1, true);
@@ -153,7 +153,7 @@ public class MySQLConnectorTest {
         when(connectionMock.prepareStatement(query.toString())).thenReturn(preparedStatementMock);
 
         MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock);
-        mySQLConnector.executeUpdateQuery(query);
+        mySQLConnector.getConnection().executeUpdateQuery(query);
 
         verify(preparedStatementMock).close();
         verify(preparedStatementMock).setBoolean(1, true);
