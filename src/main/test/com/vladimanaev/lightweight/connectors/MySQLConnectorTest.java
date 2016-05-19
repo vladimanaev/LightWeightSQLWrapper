@@ -97,6 +97,18 @@ public class MySQLConnectorTest {
 
         Assert.assertEquals("Invalid column name", secondColumnName, rows.get(1).get(1).getColumnName());
         Assert.assertEquals("Invalid column value", secondColumnValue, rows.get(1).get(1).getColumnValue());
+
+        Assert.assertEquals("Invalid column name", firstColumnName, rows.get(0).get(firstColumnName).getColumnName());
+        Assert.assertEquals("Invalid column value", firstColumnName, rows.get(0).get(firstColumnName).getColumnValue());
+
+        Assert.assertEquals("Invalid column name", secondColumnName, rows.get(0).get(secondColumnName).getColumnName());
+        Assert.assertEquals("Invalid column value", secondColumnValue, rows.get(0).get(secondColumnName).getColumnValue());
+
+        Assert.assertEquals("Invalid column name", firstColumnName, rows.get(1).get(firstColumnName).getColumnName());
+        Assert.assertEquals("Invalid column value", firstColumnName, rows.get(1).get(firstColumnName).getColumnValue());
+
+        Assert.assertEquals("Invalid column name", secondColumnName, rows.get(1).get(secondColumnName).getColumnName());
+        Assert.assertEquals("Invalid column value", secondColumnValue, rows.get(1).get(secondColumnName).getColumnValue());
     }
 
     @Test

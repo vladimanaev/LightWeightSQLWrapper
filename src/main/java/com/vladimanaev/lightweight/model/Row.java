@@ -17,6 +17,8 @@
 package com.vladimanaev.lightweight.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * This class serve as row in MySQL database
@@ -24,8 +26,55 @@ import java.util.ArrayList;
  * @author Vladi - 01:59 PM 9/12/2013
  */
 public class Row extends ArrayList<Column> {
-	
-	@Override
+
+    private final HashMap<String, Column> map = new HashMap<>();
+
+    public Row() {
+        super();
+    }
+
+    public Row(int initialCapacity) {
+        super(initialCapacity);
+    }
+
+    public Row(Collection<? extends Column> c) {
+        super(c);
+    }
+
+    @Override
+    public boolean add(Column column) {
+        map.put(column.getColumnName(), column);
+        return super.add(column);
+    }
+
+    @Override
+    public void add(int index, Column element) {
+        map.put(element.getColumnName(), element);
+        super.add(index, element);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Column> c) {
+        c.forEach(e -> map.put(e.getColumnName(), e));
+        return super.addAll(c);
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends Column> c) {
+        c.forEach(e -> map.put(e.getColumnName(), e));
+        return super.addAll(index, c);
+    }
+
+    public Column get(String columnName) {
+        return map.get(columnName);
+    }
+
+    @Override
+    public Column get(int index) {
+        return super.get(index);
+    }
+
+    @Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(" | ");
