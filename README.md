@@ -9,13 +9,13 @@ If your project is built with Maven add following to your pom file:
 <dependency>
     <groupId>com.vladimanaev</groupId>
     <artifactId>lightweight-sql-wrapper</artifactId>
-    <version>2.1</version>
+    <version>2.2</version>
 </dependency>
 ```
 
 If your project is built with Gradle add following to your gradle setting file:
 ```
-compile 'com.vladimanaev:lightweight-sql-wrapper:2.1'
+compile 'com.vladimanaev:lightweight-sql-wrapper:2.2'
 ```
 
 Dependencies
