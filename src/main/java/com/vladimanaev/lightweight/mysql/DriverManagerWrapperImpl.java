@@ -19,7 +19,6 @@ package com.vladimanaev.lightweight.mysql;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
@@ -34,59 +33,26 @@ public class DriverManagerWrapperImpl implements DriverManagerWrapper {
 
     private BasicDataSource basicDataSource;
 
-    private final String url;
-    private final String user;
-    private final String password;
-
-    public static DriverManagerWrapperImpl withoutConnectionPool(String url, String user, String password) {
-        return new DriverManagerWrapperImpl(url, user, password);
+    public static DriverManagerWrapperImpl createDefaultConnectionPool(String url, String user, String password) {
+        return new DriverManagerWrapperImpl(url, user, password, 10, 0);
     }
 
-    public static DriverManagerWrapperImpl withConnectionPool(String url, String user, String password, int size) {
-        return new DriverManagerWrapperImpl(url, user, password, size);
+    public static DriverManagerWrapperImpl createConnectionPool(String url, String user, String password, int totalMax, int initialSize) {
+        return new DriverManagerWrapperImpl(url, user, password, totalMax, initialSize);
     }
 
-    public DriverManagerWrapperImpl(String url, String user, String password) {
-        this.url = url;
-        this.user = user;
-        this.password = password;
-    }
-
-    public DriverManagerWrapperImpl(String url, String user, String password, int size) {
-        this(url, user, password);
-
+    public DriverManagerWrapperImpl(String url, String user, String password, int totalMax, int initialSize) {
         basicDataSource = new BasicDataSource();
         basicDataSource.setDriverClassName(DRIVER_NAME);
         basicDataSource.setUrl(url);
         basicDataSource.setUsername(user);
         basicDataSource.setPassword(password);
-        basicDataSource.setInitialSize(size);
+        basicDataSource.setInitialSize(initialSize);
+        basicDataSource.setMaxTotal(totalMax);
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        try {
-            if(isUsingConnectionPool()) {
-                return getConnectionFromPool();
-            }
-
-            return getNewConnection(url, user, password);
-
-        } catch(ClassNotFoundException e) {
-            throw new SQLException(String.format("Missing '%s'", DRIVER_NAME), e);
-        }
-    }
-
-    private Connection getConnectionFromPool() throws SQLException {
         return basicDataSource.getConnection();
-    }
-
-    private boolean isUsingConnectionPool() {
-        return basicDataSource != null;
-    }
-
-    private Connection getNewConnection(String url, String user, String password) throws ClassNotFoundException, SQLException {
-        Class.forName(DRIVER_NAME);
-        return DriverManager.getConnection(url, user, password);
     }
 }
