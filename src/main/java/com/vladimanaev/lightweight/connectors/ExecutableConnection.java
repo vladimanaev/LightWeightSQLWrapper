@@ -18,7 +18,11 @@ package com.vladimanaev.lightweight.connectors;
 import com.vladimanaev.lightweight.model.Query;
 import com.vladimanaev.lightweight.model.Result;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Created by Vladi
@@ -31,6 +35,11 @@ public interface ExecutableConnection extends AutoCloseable {
     void executeUpdateQuery(Query query) throws SQLException;
 
     Result executeSelectQuery(Query query) throws SQLException;
+
+    <T> List<T> executeSelectQuery(Class<T> resultClassObj,
+                                   Supplier<T> resultClassObjCreator,
+                                   Function<Field, String> getColumnNameFunc,
+                                   Query query) throws SQLException;
 
     void commit() throws SQLException;
 

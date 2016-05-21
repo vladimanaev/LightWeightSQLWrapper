@@ -15,13 +15,18 @@
  ******************************************************************************/
 package com.vladimanaev.lightweight.connectors;
 
+import com.vladimanaev.lightweight.exceptions.IllegalRowState;
 import com.vladimanaev.lightweight.exceptions.IllegalSQLQueryException;
+import com.vladimanaev.lightweight.model.*;
 import com.vladimanaev.lightweight.model.Column;
-import com.vladimanaev.lightweight.model.Query;
-import com.vladimanaev.lightweight.model.Result;
-import com.vladimanaev.lightweight.model.Row;
 
+import java.lang.reflect.Field;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Created by Vladi
@@ -109,6 +114,76 @@ public class MySQLExecutableConnection implements ExecutableConnection {
         }
 
         return result;
+    }
+
+    @Override
+    public <T> List<T> executeSelectQuery(Class<T> resultClassObj, Supplier<T> resultClassObjCreator, Function<Field, String> getColumnNameFunc, Query query) throws SQLException {
+        List<T> res = new ArrayList<>();
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            preparedStatement = connection.prepareStatement(query.toString());
+            updatePreparedStatementWithParameters(preparedStatement, query);
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                T obj = resultClassObjCreator.get();
+                List<Field> allFields = getAllFields(obj.getClass());
+
+                for (Field f : allFields) {
+                    f.setAccessible(true);
+                    String suppliedColumnName = getColumnNameFunc.apply(f);
+                    if (suppliedColumnName != null) {
+                        setField(obj, f, resultSet, suppliedColumnName);
+                    } else {
+                        //in case of no annotation supplied taking field name
+                        setField(obj, f, resultSet, f.getName());
+                    }
+                }
+
+                res.add(obj);
+            }
+
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+
+        return res;
+    }
+
+    private static List<Field> getAllFields(Class<?> type) {
+        List<Field> fields = new ArrayList<>();
+        for (Class<?> c = type ; c != null ; c = c.getSuperclass()) {
+            fields.addAll(Arrays.asList(c.getDeclaredFields()));
+        }
+        return fields;
+    }
+
+    private static void setField(Object target, Field f, ResultSet row, String columnName) throws SQLException {
+        try {
+            Class<?> type = f.getType();
+            if (Long.class.isAssignableFrom(type) || long.class.isAssignableFrom(type)) {
+                f.set(target, row.getLong(columnName));
+            } else if (String.class.isAssignableFrom(type)) {
+                f.set(target, row.getString(columnName));
+            } else if(int.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type)) {
+                f.set(target, row.getInt(columnName));
+            } else if(Double.class.isAssignableFrom(type) || double.class.isAssignableFrom(type)) {
+                f.set(target, row.getDouble(columnName));
+            } else if(Enum.class.isAssignableFrom(type)) {
+                f.set(target, Enum.valueOf((Class<Enum>) type, row.getString(columnName)));
+            } else if(Boolean.class.isAssignableFrom(type) || boolean.class.isAssignableFrom(type)) {
+                f.set(target, row.getBoolean(columnName));
+            }
+            //TODO add support for short, byte, date, char
+        } catch (IllegalAccessException e) {
+            throw new IllegalRowState(String.format("Offending column [%s]", columnName));
+        }
     }
 
     /**

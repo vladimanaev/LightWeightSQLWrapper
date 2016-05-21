@@ -18,6 +18,8 @@ package com.vladimanaev.lightweight.connectors;
 
 import com.vladimanaev.lightweight.model.Query;
 import com.vladimanaev.lightweight.model.Result;
+import com.vladimanaev.lightweight.model.RowObjectForTesting;
+import com.vladimanaev.lightweight.model.annotation.ColumnDetails;
 import com.vladimanaev.lightweight.mysql.DriverManagerWrapper;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,6 +27,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.sql.*;
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -37,6 +40,8 @@ import static org.mockito.Mockito.when;
  * Copyright VMSR
  */
 public class MySQLConnectorTest {
+
+    private static final double EPSILON = 0.000001;
 
     @Test
     public void testSimpleSelect() throws Exception {
@@ -167,5 +172,111 @@ public class MySQLConnectorTest {
         verify(preparedStatementMock).setString(9, "LONGVARCHAR");
         verify(preparedStatementMock).setDate(10, Date.valueOf("2016-01-20"));
         verify(preparedStatementMock).setDate(11, Date.valueOf("2016-01-21"));
+    }
+
+    @Test
+    public void testColumnAnnotation() throws SQLException {
+        final int numOfRows = 2;
+        final int numOfColumns = 9;
+
+        String primitiveLongName = "primitive_long";
+        long primitiveLongValue = 1;
+
+        String objLongName = "obj_long";
+        Long objLongValue = 2L;
+
+        String primitiveIntName = "primitive_int";
+        int primitiveIntValue = 3;
+
+        String objIntName = "obj_int";
+        Integer objIntValue = 4;
+
+        String primitiveDoubleName = "primitive_double";
+        double primitiveDoubleValue = 5.0;
+
+        String objDoubleName = "obj_double";
+        Double objDoubleValue = 6.0;
+
+        String primitiveBooleanName = "primitive_boolean";
+        boolean primitiveBooleanValue = false;
+
+        String objBooleanName = "obj_boolean";
+        Boolean objBooleanValue = true;
+
+        String objStringName = "obj_string";
+        String objStringValue = "obj_string-value";
+
+        String enumTypeName = "enum_type";
+        String enumTypeValue = "TESTING";
+
+        String noAnnotationName = "fieldWithoutAnnotations";
+        String noAnnotationValue = "fieldWithoutAnnotations-value";
+
+
+        Query query = new Query("select * from vladi;");
+
+        final DriverManagerWrapper driverManagerWrapperMock = mock(DriverManagerWrapper.class);
+        final Connection connectionMock = mock(Connection.class);
+        final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
+        final ResultSet resultSetMock = mock(ResultSet.class);
+        final ResultSetMetaData resultSetMetaDataMock = mock(ResultSetMetaData.class);
+
+        when(driverManagerWrapperMock.getConnection()).thenReturn(connectionMock);
+        when(connectionMock.prepareStatement(query.toString())).thenReturn(preparedStatementMock);
+        when(preparedStatementMock.executeQuery()).thenReturn(resultSetMock);
+        when(resultSetMock.getMetaData()).thenReturn(resultSetMetaDataMock);
+
+        when(resultSetMetaDataMock.getColumnCount()).thenReturn(numOfColumns);
+        when(resultSetMock.getLong(primitiveLongName)).thenReturn(primitiveLongValue);
+        when(resultSetMock.getLong(objLongName)).thenReturn(objLongValue);
+        when(resultSetMock.getInt(primitiveIntName)).thenReturn(primitiveIntValue);
+        when(resultSetMock.getInt(objIntName)).thenReturn(objIntValue);
+        when(resultSetMock.getDouble(primitiveDoubleName)).thenReturn(primitiveDoubleValue);
+        when(resultSetMock.getDouble(objDoubleName)).thenReturn(objDoubleValue);
+        when(resultSetMock.getBoolean(primitiveBooleanName)).thenReturn(primitiveBooleanValue);
+        when(resultSetMock.getBoolean(objBooleanName)).thenReturn(objBooleanValue);
+        when(resultSetMock.getString(objStringName)).thenReturn(objStringValue);
+        when(resultSetMock.getString(noAnnotationName)).thenReturn(noAnnotationValue);
+        when(resultSetMock.getString(enumTypeName)).thenReturn(enumTypeValue);
+
+        when(resultSetMock.next()).then(new Answer<Boolean>() {
+            private int count = 0;
+
+            @Override
+            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable {
+                return count++ < numOfRows;
+            }
+        });
+
+        MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock);
+        List<RowObjectForTesting> rows = mySQLConnector.getConnection().executeSelectQuery(RowObjectForTesting.class, RowObjectForTesting::new, (f) -> {
+            ColumnDetails annotation = f.getAnnotation(ColumnDetails.class);
+            return annotation != null ? annotation.name() : null;
+        } ,query);
+
+        verify(resultSetMock).close();
+        verify(preparedStatementMock).close();
+
+        Assert.assertEquals("Invalid result size", numOfRows, rows.size());
+
+        Assert.assertEquals("Invalid primitive long", Long.valueOf(1), rows.get(0).getPrimitiveLong());
+        Assert.assertEquals("Invalid obj long", Long.valueOf(2), rows.get(0).getObjLong());
+
+        Assert.assertEquals("Invalid primitive int", 3, rows.get(0).getPrimitiveInt());
+        Assert.assertEquals("Invalid obj int", Integer.valueOf(4), rows.get(0).getObjInt());
+
+        Assert.assertEquals("Invalid primitive double", 5.0, rows.get(0).getPrimitiveDouble(), EPSILON);
+        Assert.assertEquals("Invalid obj double", 6.0, rows.get(0).getObjDouble(), EPSILON);
+
+        Assert.assertEquals("Invalid primitive boolean", false, rows.get(0).getPrimitiveBoolean());
+        Assert.assertEquals("Invalid obj boolean", true, rows.get(0).getObjBoolean());
+
+        Assert.assertEquals("Invalid obj_string", "obj_string-value", rows.get(0).getObjString());
+
+        Assert.assertEquals("Invalid enum type", RowObjectForTesting.EnumForTesting.TESTING, rows.get(0).getEnumType());
+        Assert.assertEquals("Invalid obj_string", "obj_string-value", rows.get(0).getObjString());
+        Assert.assertEquals("Invalid fieldWithoutAnnotations", "fieldWithoutAnnotations-value", rows.get(0).getFieldWithoutAnnotations());
+
+        //TODO add test for field that is present in the obj but not in DB - should fail in such case
     }
 }
