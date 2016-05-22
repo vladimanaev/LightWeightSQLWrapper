@@ -53,6 +53,8 @@ public class RowObjectForTesting {
 
     private String fieldWithoutAnnotations;
 
+    private String fieldWithoutColumnInDb;
+
     public static String justStaticField; //allowed and not mapped
 
     public static final String justStaticFinalField = "dummy_str"; //allowed and not mapped
@@ -103,6 +105,14 @@ public class RowObjectForTesting {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getFieldWithoutColumnInDb() {
+        return fieldWithoutColumnInDb;
+    }
+
+    public void setFieldWithoutColumnInDb(String fieldWithoutColumnInDb) {
+        this.fieldWithoutColumnInDb = fieldWithoutColumnInDb;
     }
 
     public static enum EnumForTesting {

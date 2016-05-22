@@ -289,6 +289,7 @@ public class MySQLConnectorTest {
         Assert.assertEquals("Invalid enum type", RowObjectForTesting.EnumForTesting.TESTING, currentRow.getEnumType());
         Assert.assertEquals("Invalid obj_string", "obj_string-value", currentRow.getObjString());
         Assert.assertEquals("Invalid fieldWithoutAnnotations", "fieldWithoutAnnotations-value", currentRow.getFieldWithoutAnnotations());
+        Assert.assertNull("Invalid fieldWithoutColumnInDb", currentRow.getFieldWithoutColumnInDb());
         Assert.assertEquals("Invalid justStaticField", "dummy_str", RowObjectForTesting.justStaticFinalField);
         Assert.assertNull("Invalid justStaticField", RowObjectForTesting.justStaticField);
         Assert.assertEquals("Invalid date", dateValue, currentRow.getDate());
