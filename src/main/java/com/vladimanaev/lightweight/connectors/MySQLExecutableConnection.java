@@ -21,6 +21,7 @@ import com.vladimanaev.lightweight.model.*;
 import com.vladimanaev.lightweight.model.Column;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -131,13 +132,15 @@ public class MySQLExecutableConnection implements ExecutableConnection {
                 List<Field> allFields = getAllFields(obj.getClass());
 
                 for (Field f : allFields) {
-                    f.setAccessible(true);
-                    String suppliedColumnName = getColumnNameFunc.apply(f);
-                    if (suppliedColumnName != null) {
-                        setField(obj, f, resultSet, suppliedColumnName);
-                    } else {
-                        //in case of no annotation supplied taking field name
-                        setField(obj, f, resultSet, f.getName());
+                    if(!isStaticField(f)) {
+                        f.setAccessible(true);
+                        String suppliedColumnName = getColumnNameFunc.apply(f);
+                        if (suppliedColumnName != null) {
+                            setField(obj, f, resultSet, suppliedColumnName);
+                        } else {
+                            //in case of no annotation supplied taking field name
+                            setField(obj, f, resultSet, f.getName());
+                        }
                     }
                 }
 
@@ -154,6 +157,10 @@ public class MySQLExecutableConnection implements ExecutableConnection {
         }
 
         return res;
+    }
+
+    private static boolean isStaticField(Field f) {
+        return Modifier.isStatic(f.getModifiers());
     }
 
     private static List<Field> getAllFields(Class<?> type) {
@@ -179,6 +186,8 @@ public class MySQLExecutableConnection implements ExecutableConnection {
                 f.set(target, Enum.valueOf((Class<Enum>) type, row.getString(columnName)));
             } else if(Boolean.class.isAssignableFrom(type) || boolean.class.isAssignableFrom(type)) {
                 f.set(target, row.getBoolean(columnName));
+            }  else if(Float.class.isAssignableFrom(type) || float.class.isAssignableFrom(type)) {
+                f.set(target, row.getFloat(columnName));
             }
             //TODO add support for short, byte, date, char
         } catch (IllegalAccessException e) {

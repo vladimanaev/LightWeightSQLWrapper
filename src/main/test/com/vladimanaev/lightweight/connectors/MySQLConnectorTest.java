@@ -197,6 +197,12 @@ public class MySQLConnectorTest {
         String objDoubleName = "obj_double";
         Double objDoubleValue = 6.0;
 
+        String primitiveFloatName = "primitive_float";
+        float primitiveFloatValue = 7.0F;
+
+        String objFloatName = "obj_float";
+        Float objFloatValue = 8.0F;
+
         String primitiveBooleanName = "primitive_boolean";
         boolean primitiveBooleanValue = false;
 
@@ -235,6 +241,8 @@ public class MySQLConnectorTest {
         when(resultSetMock.getDouble(objDoubleName)).thenReturn(objDoubleValue);
         when(resultSetMock.getBoolean(primitiveBooleanName)).thenReturn(primitiveBooleanValue);
         when(resultSetMock.getBoolean(objBooleanName)).thenReturn(objBooleanValue);
+        when(resultSetMock.getFloat(primitiveFloatName)).thenReturn(primitiveFloatValue);
+        when(resultSetMock.getFloat(objFloatName)).thenReturn(objFloatValue);
         when(resultSetMock.getString(objStringName)).thenReturn(objStringValue);
         when(resultSetMock.getString(noAnnotationName)).thenReturn(noAnnotationValue);
         when(resultSetMock.getString(enumTypeName)).thenReturn(enumTypeValue);
@@ -259,23 +267,29 @@ public class MySQLConnectorTest {
 
         Assert.assertEquals("Invalid result size", numOfRows, rows.size());
 
-        Assert.assertEquals("Invalid primitive long", Long.valueOf(1), rows.get(0).getPrimitiveLong());
-        Assert.assertEquals("Invalid obj long", Long.valueOf(2), rows.get(0).getObjLong());
+        RowObjectForTesting currentRow = rows.get(0);
+        Assert.assertEquals("Invalid primitive long", Long.valueOf(1), currentRow.getPrimitiveLong());
+        Assert.assertEquals("Invalid obj long", Long.valueOf(2), currentRow.getObjLong());
 
-        Assert.assertEquals("Invalid primitive int", 3, rows.get(0).getPrimitiveInt());
-        Assert.assertEquals("Invalid obj int", Integer.valueOf(4), rows.get(0).getObjInt());
+        Assert.assertEquals("Invalid primitive int", 3, currentRow.getPrimitiveInt());
+        Assert.assertEquals("Invalid obj int", Integer.valueOf(4), currentRow.getObjInt());
 
-        Assert.assertEquals("Invalid primitive double", 5.0, rows.get(0).getPrimitiveDouble(), EPSILON);
-        Assert.assertEquals("Invalid obj double", 6.0, rows.get(0).getObjDouble(), EPSILON);
+        Assert.assertEquals("Invalid primitive double", 5.0, currentRow.getPrimitiveDouble(), EPSILON);
+        Assert.assertEquals("Invalid obj double", 6.0, currentRow.getObjDouble(), EPSILON);
 
-        Assert.assertEquals("Invalid primitive boolean", false, rows.get(0).getPrimitiveBoolean());
-        Assert.assertEquals("Invalid obj boolean", true, rows.get(0).getObjBoolean());
+        Assert.assertEquals("Invalid primitive float", 7.0, currentRow.getPrimitiveFloat(), EPSILON);
+        Assert.assertEquals("Invalid obj float", 8.0, currentRow.getObjFloat(), EPSILON);
 
-        Assert.assertEquals("Invalid obj_string", "obj_string-value", rows.get(0).getObjString());
+        Assert.assertEquals("Invalid primitive boolean", false, currentRow.getPrimitiveBoolean());
+        Assert.assertEquals("Invalid obj boolean", true, currentRow.getObjBoolean());
 
-        Assert.assertEquals("Invalid enum type", RowObjectForTesting.EnumForTesting.TESTING, rows.get(0).getEnumType());
-        Assert.assertEquals("Invalid obj_string", "obj_string-value", rows.get(0).getObjString());
-        Assert.assertEquals("Invalid fieldWithoutAnnotations", "fieldWithoutAnnotations-value", rows.get(0).getFieldWithoutAnnotations());
+        Assert.assertEquals("Invalid obj_string", "obj_string-value", currentRow.getObjString());
+
+        Assert.assertEquals("Invalid enum type", RowObjectForTesting.EnumForTesting.TESTING, currentRow.getEnumType());
+        Assert.assertEquals("Invalid obj_string", "obj_string-value", currentRow.getObjString());
+        Assert.assertEquals("Invalid fieldWithoutAnnotations", "fieldWithoutAnnotations-value", currentRow.getFieldWithoutAnnotations());
+        Assert.assertEquals("Invalid justStaticField", "dummy_str", RowObjectForTesting.justStaticFinalField);
+        Assert.assertNull("Invalid justStaticField", RowObjectForTesting.justStaticField);
 
         //TODO add test for field that is present in the obj but not in DB - should fail in such case
     }

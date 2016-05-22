@@ -34,6 +34,12 @@ public class RowObjectForTesting {
     @ColumnDetails(name = "obj_boolean")
     private Boolean objBoolean;
 
+    @ColumnDetails(name = "primitive_float")
+    private float primitiveFloat;
+
+    @ColumnDetails(name = "obj_float")
+    private Float objFloat;
+
     @ColumnDetails(name = "obj_string")
     private String objString;
 
@@ -41,6 +47,10 @@ public class RowObjectForTesting {
     private EnumForTesting enumType;
 
     private String fieldWithoutAnnotations;
+
+    public static String justStaticField; //allowed and not mapped
+
+    public static final String justStaticFinalField = "dummy_str"; //allowed and not mapped
 
     public EnumForTesting getEnumType() {
         return enumType;
@@ -64,6 +74,22 @@ public class RowObjectForTesting {
 
     public void setObjBoolean(Boolean objBoolean) {
         this.objBoolean = objBoolean;
+    }
+
+    public float getPrimitiveFloat() {
+        return primitiveFloat;
+    }
+
+    public void setPrimitiveFloat(float primitiveFloat) {
+        this.primitiveFloat = primitiveFloat;
+    }
+
+    public Float getObjFloat() {
+        return objFloat;
+    }
+
+    public void setObjFloat(Float objFloat) {
+        this.objFloat = objFloat;
     }
 
     public static enum EnumForTesting {
