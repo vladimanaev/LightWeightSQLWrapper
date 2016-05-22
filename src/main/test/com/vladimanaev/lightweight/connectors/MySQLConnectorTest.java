@@ -315,10 +315,51 @@ public class MySQLConnectorTest {
         Assert.assertEquals("Invalid enum type", RowObjectForTesting.EnumForTesting.TESTING, currentRow.getEnumType());
         Assert.assertEquals("Invalid obj_string", "obj_string-value", currentRow.getObjString());
         Assert.assertEquals("Invalid fieldWithoutAnnotations", "fieldWithoutAnnotations-value", currentRow.getFieldWithoutAnnotations());
-        Assert.assertNull("Invalid fieldWithoutColumnInDb", currentRow.getFieldWithoutColumnInDb());
         Assert.assertEquals("Invalid justStaticField", "dummy_str", RowObjectForTesting.justStaticFinalField);
         Assert.assertNull("Invalid justStaticField", RowObjectForTesting.justStaticField);
         Assert.assertEquals("Invalid date", dateValue, currentRow.getDate());
-        //TODO add test for field that is present in the obj but not in DB - should fail in such case
+    }
+
+    @Test
+    public void testColumnExistsInObjNutNotInDb_expectingError() throws SQLException {
+        String fieldWithoutColumnInDbName = "fieldWithoutColumnInDb";
+
+        Query query = new Query("select * from vladi;");
+
+        final DriverManagerWrapper driverManagerWrapperMock = mock(DriverManagerWrapper.class);
+        final Connection connectionMock = mock(Connection.class);
+        final PreparedStatement preparedStatementMock = mock(PreparedStatement.class);
+        final ResultSet resultSetMock = mock(ResultSet.class);
+
+        when(driverManagerWrapperMock.getConnection()).thenReturn(connectionMock);
+        when(connectionMock.prepareStatement(query.toString())).thenReturn(preparedStatementMock);
+        when(preparedStatementMock.executeQuery()).thenReturn(resultSetMock);
+
+        when(resultSetMock.getString("enum_type")).thenReturn("TESTING");
+        when(resultSetMock.getDate("date")).thenReturn(null);
+        when(resultSetMock.getString(fieldWithoutColumnInDbName)).thenThrow(new SQLException());
+
+        when(resultSetMock.next()).then(new Answer<Boolean>() {
+            private int count = 0;
+
+            @Override
+            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable {
+                return count++ < 1;
+            }
+        });
+
+        MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapperMock);
+        try {
+
+            mySQLConnector.getConnection().executeSelectQuery(RowObjectForTesting.class, RowObjectForTesting::new, (f) -> {
+                ColumnDetails annotation = f.getAnnotation(ColumnDetails.class);
+                return annotation != null ? annotation.name() : null;
+            } ,query);
+
+            Assert.fail("Should throw exception in case of existing column in obj without column in db");
+        } catch (SQLException ignored) { }
+
+        verify(resultSetMock).close();
+        verify(preparedStatementMock).close();
     }
 }
