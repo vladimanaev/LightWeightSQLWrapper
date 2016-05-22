@@ -294,6 +294,31 @@ public class MySQLConnectorTest {
         Assert.assertNull("Invalid justStaticField", RowObjectForTesting.justStaticField);
         Assert.assertEquals("Invalid date", dateValue, currentRow.getDate());
 
+        currentRow = rows.get(1);
+        Assert.assertEquals("Invalid primitive long", Long.valueOf(1), currentRow.getPrimitiveLong());
+        Assert.assertEquals("Invalid obj long", Long.valueOf(2), currentRow.getObjLong());
+
+        Assert.assertEquals("Invalid primitive int", 3, currentRow.getPrimitiveInt());
+        Assert.assertEquals("Invalid obj int", Integer.valueOf(4), currentRow.getObjInt());
+
+        Assert.assertEquals("Invalid primitive double", 5.0, currentRow.getPrimitiveDouble(), EPSILON);
+        Assert.assertEquals("Invalid obj double", 6.0, currentRow.getObjDouble(), EPSILON);
+
+        Assert.assertEquals("Invalid primitive float", 7.0, currentRow.getPrimitiveFloat(), EPSILON);
+        Assert.assertEquals("Invalid obj float", 8.0, currentRow.getObjFloat(), EPSILON);
+
+        Assert.assertEquals("Invalid primitive boolean", false, currentRow.getPrimitiveBoolean());
+        Assert.assertEquals("Invalid obj boolean", true, currentRow.getObjBoolean());
+
+        Assert.assertEquals("Invalid obj_string", "obj_string-value", currentRow.getObjString());
+
+        Assert.assertEquals("Invalid enum type", RowObjectForTesting.EnumForTesting.TESTING, currentRow.getEnumType());
+        Assert.assertEquals("Invalid obj_string", "obj_string-value", currentRow.getObjString());
+        Assert.assertEquals("Invalid fieldWithoutAnnotations", "fieldWithoutAnnotations-value", currentRow.getFieldWithoutAnnotations());
+        Assert.assertNull("Invalid fieldWithoutColumnInDb", currentRow.getFieldWithoutColumnInDb());
+        Assert.assertEquals("Invalid justStaticField", "dummy_str", RowObjectForTesting.justStaticFinalField);
+        Assert.assertNull("Invalid justStaticField", RowObjectForTesting.justStaticField);
+        Assert.assertEquals("Invalid date", dateValue, currentRow.getDate());
         //TODO add test for field that is present in the obj but not in DB - should fail in such case
     }
 }
