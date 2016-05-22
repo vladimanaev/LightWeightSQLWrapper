@@ -46,9 +46,12 @@ public class TestResultObj {
 }
 
 // code example
+
+//initialize once
 DriverManagerWrapperImpl driverManagerWrapper = DriverManagerWrapperImpl.createDefaultConnectionPool("db_url", "test_user", "password");
 MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapper);
 
+//on each query do following
 Query query = new Query("SELECT * FROM somewhere WHERE everything_is_good = ?");
 query.addParameter("true", JDBCType.BOOLEAN);
 
