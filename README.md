@@ -37,6 +37,14 @@ Example
 ============
 ```java
 
+//result object class example
+public class TestResultObj {
+
+    @ColumnDetails(name = "test_column")
+    private String column;
+
+}
+
 // code example
 DriverManagerWrapperImpl driverManagerWrapper = DriverManagerWrapperImpl.createDefaultConnectionPool("db_url", "test_user", "password");
 MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapper);
@@ -44,17 +52,10 @@ MySQLConnector mySQLConnector = new MySQLConnector(driverManagerWrapper);
 Query query = new Query("SELECT * FROM somewhere WHERE everything_is_good = ?");
 query.addParameter("true", JDBCType.BOOLEAN);
 
-List<TestResultObj> testResultObjs = mySQLConnector.getConnection().executeSelectQuery(TestResultObj.class, TestResultObj::new, (f) -> {
+List<TestResultObj> testResultObjs = mySQLConnector.getConnection().executeSelectQuery(TestResultObj.class,
+                                                                                       TestResultObj::new, (f) -> {
     ColumnDetails annotation = f.getAnnotation(ColumnDetails.class);
     return annotation != null ? annotation.name() : null;
 }, query);
 
-
-//result object class example
-public static class TestResultObj {
-
-    @ColumnDetails(name = "test_column")
-    private String column;
-
-}
 ```
