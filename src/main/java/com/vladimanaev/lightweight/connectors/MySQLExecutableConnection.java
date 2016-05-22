@@ -188,8 +188,10 @@ public class MySQLExecutableConnection implements ExecutableConnection {
                 f.set(target, row.getBoolean(columnName));
             }  else if(Float.class.isAssignableFrom(type) || float.class.isAssignableFrom(type)) {
                 f.set(target, row.getFloat(columnName));
+            }  else if(Date.class.isAssignableFrom(type)) {
+                f.set(target, row.getDate(columnName));
             }
-            //TODO add support for short, byte, date, char
+            //TODO add support for short, byte, char
         } catch (IllegalAccessException e) {
             throw new IllegalRowState(String.format("Offending column [%s]", columnName));
         }

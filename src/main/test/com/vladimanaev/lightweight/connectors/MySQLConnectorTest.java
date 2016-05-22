@@ -177,7 +177,6 @@ public class MySQLConnectorTest {
     @Test
     public void testColumnAnnotation() throws SQLException {
         final int numOfRows = 2;
-        final int numOfColumns = 9;
 
         String primitiveLongName = "primitive_long";
         long primitiveLongValue = 1;
@@ -218,6 +217,8 @@ public class MySQLConnectorTest {
         String noAnnotationName = "fieldWithoutAnnotations";
         String noAnnotationValue = "fieldWithoutAnnotations-value";
 
+        String dateName = "date";
+        Date dateValue = new Date(System.currentTimeMillis());
 
         Query query = new Query("select * from vladi;");
 
@@ -232,7 +233,6 @@ public class MySQLConnectorTest {
         when(preparedStatementMock.executeQuery()).thenReturn(resultSetMock);
         when(resultSetMock.getMetaData()).thenReturn(resultSetMetaDataMock);
 
-        when(resultSetMetaDataMock.getColumnCount()).thenReturn(numOfColumns);
         when(resultSetMock.getLong(primitiveLongName)).thenReturn(primitiveLongValue);
         when(resultSetMock.getLong(objLongName)).thenReturn(objLongValue);
         when(resultSetMock.getInt(primitiveIntName)).thenReturn(primitiveIntValue);
@@ -246,6 +246,7 @@ public class MySQLConnectorTest {
         when(resultSetMock.getString(objStringName)).thenReturn(objStringValue);
         when(resultSetMock.getString(noAnnotationName)).thenReturn(noAnnotationValue);
         when(resultSetMock.getString(enumTypeName)).thenReturn(enumTypeValue);
+        when(resultSetMock.getDate(dateName)).thenReturn(dateValue);
 
         when(resultSetMock.next()).then(new Answer<Boolean>() {
             private int count = 0;
@@ -290,6 +291,7 @@ public class MySQLConnectorTest {
         Assert.assertEquals("Invalid fieldWithoutAnnotations", "fieldWithoutAnnotations-value", currentRow.getFieldWithoutAnnotations());
         Assert.assertEquals("Invalid justStaticField", "dummy_str", RowObjectForTesting.justStaticFinalField);
         Assert.assertNull("Invalid justStaticField", RowObjectForTesting.justStaticField);
+        Assert.assertEquals("Invalid date", dateValue, currentRow.getDate());
 
         //TODO add test for field that is present in the obj but not in DB - should fail in such case
     }

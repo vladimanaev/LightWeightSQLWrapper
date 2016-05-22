@@ -2,6 +2,8 @@ package com.vladimanaev.lightweight.model;
 
 import com.vladimanaev.lightweight.model.annotation.*;
 
+import java.sql.Date;
+
 /**
  * Created by Vladi
  * Date: 5/21/2016
@@ -45,6 +47,9 @@ public class RowObjectForTesting {
 
     @ColumnDetails(name = "enum_type")
     private EnumForTesting enumType;
+
+    @ColumnDetails(name = "date")
+    private Date date;
 
     private String fieldWithoutAnnotations;
 
@@ -90,6 +95,14 @@ public class RowObjectForTesting {
 
     public void setObjFloat(Float objFloat) {
         this.objFloat = objFloat;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public static enum EnumForTesting {
