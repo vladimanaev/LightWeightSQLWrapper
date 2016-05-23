@@ -24,7 +24,7 @@ Dependencies
 <dependency>
 	<groupId>mysql</groupId>
 	<artifactId>mysql-connector-java</artifactId>
-	<version>5.1.6</version>
+	<version>6.0.2</version>
 </dependency>
 <dependency>
     <groupId>org.apache.commons</groupId>
