@@ -99,7 +99,7 @@ public class MySQLExecutableConnection implements ExecutableConnection {
             while (resultSet.next()) {
                 Row currRow = new Row();
                 for (int columnNumber = 1; columnNumber <= maxNumberOfColumns; columnNumber++) {
-                    currRow.add(new Column(resultMetaData.getColumnName(columnNumber), resultSet.getString(columnNumber)));
+                    currRow.add(new Column(resultMetaData.getColumnLabel(columnNumber), resultSet.getString(columnNumber)));
                 }
 
                 result.add(currRow);
