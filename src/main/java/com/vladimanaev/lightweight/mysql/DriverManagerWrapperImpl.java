@@ -49,6 +49,11 @@ public class DriverManagerWrapperImpl implements DriverManagerWrapper {
         basicDataSource.setPassword(password);
         basicDataSource.setInitialSize(initialSize);
         basicDataSource.setMaxTotal(totalMax);
+        basicDataSource.setDefaultAutoCommit(false);
+    }
+
+    public DriverManagerWrapperImpl(BasicDataSource basicDataSource) {
+        this.basicDataSource = basicDataSource;
     }
 
     @Override

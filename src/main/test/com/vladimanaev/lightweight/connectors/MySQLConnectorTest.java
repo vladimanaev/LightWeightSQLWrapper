@@ -67,11 +67,11 @@ public class MySQLConnectorTest {
         when(resultSetMock.getMetaData()).thenReturn(resultSetMetaDataMock);
 
         when(resultSetMetaDataMock.getColumnCount()).thenReturn(numOfColumns);
-        when(resultSetMetaDataMock.getColumnName(1)).thenReturn(firstColumnName);
+        when(resultSetMetaDataMock.getColumnLabel(1)).thenReturn(firstColumnName);
         when(resultSetMock.getString(1)).thenReturn(firstColumnValue);
 
         when(resultSetMetaDataMock.getColumnCount()).thenReturn(numOfColumns);
-        when(resultSetMetaDataMock.getColumnName(2)).thenReturn(secondColumnName);
+        when(resultSetMetaDataMock.getColumnLabel(2)).thenReturn(secondColumnName);
         when(resultSetMock.getString(2)).thenReturn(secondColumnValue);
 
         when(resultSetMock.next()).then(new Answer<Boolean>() {
